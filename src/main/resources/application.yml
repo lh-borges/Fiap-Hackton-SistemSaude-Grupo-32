@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: sus-plataforma
+  profiles:
+    active: local
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/sus}
+    username: ${DB_USER:sus}
+    password: ${DB_PASSWORD:sus}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: ${APP_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
+
+sus:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:segredo-local-de-desenvolvimento-do-hackathon-fiap-grupo32}
+      expiracao-ms: ${JWT_EXPIRATION:28800000}
+      emissor: sus-plataforma
+  seed:
+    enabled: ${SEED_ENABLED:true}
+    admin-nome: ${SEED_ADMIN_NOME:Administrador do Sistema}
+    admin-email: ${SEED_ADMIN_EMAIL:admin@sus.gov.br}
+    admin-senha: ${SEED_ADMIN_SENHA:Admin@123}
+    admin-cpf: ${SEED_ADMIN_CPF:52998224725}
+
+logging:
+  level:
+    root: INFO
+    br.com.fiap.sus: INFO

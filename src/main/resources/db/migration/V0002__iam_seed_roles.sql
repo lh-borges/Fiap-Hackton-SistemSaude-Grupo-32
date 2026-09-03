@@ -1,0 +1,6 @@
+-- Perfis fixos do dominio (RF-07). UUID deterministico para facilitar seed e Postman.
+INSERT INTO iam_role (id, nome) VALUES
+    ('00000000-0000-0000-0000-0000000000a1', 'ADMINISTRADOR'),
+    ('00000000-0000-0000-0000-0000000000a2', 'ATENDENTE'),
+    ('00000000-0000-0000-0000-0000000000a3', 'MEDICO'),
+    ('00000000-0000-0000-0000-0000000000a4', 'PACIENTE');
