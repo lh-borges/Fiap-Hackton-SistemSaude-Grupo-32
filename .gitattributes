@@ -1,0 +1,29 @@
+# Normaliza fim de linha: o repositorio guarda LF, cada maquina usa o que quiser.
+# Evita que diffs de CRLF/LF poluam os PRs do time.
+* text=auto eol=lf
+
+# Scripts que precisam de fim de linha especifico independente do SO.
+*.sh      text eol=lf
+mvnw      text eol=lf
+*.cmd     text eol=crlf
+*.bat     text eol=crlf
+*.ps1     text eol=crlf
+
+# Tipos textuais do projeto, declarados para evitar deteccao errada.
+*.java    text diff=java
+*.sql     text
+*.yml     text
+*.yaml    text
+*.xml     text
+*.json    text
+*.md      text diff=markdown
+
+# Binarios: nunca converter nem tentar fazer diff.
+*.jar     binary
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.pdf     binary
+*.zip     binary
