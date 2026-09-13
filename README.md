@@ -17,10 +17,10 @@ histórico e rastreabilidade.
 | `shared` | tipos comuns, erro RFC 7807, contexto de segurança | ✅ implementado |
 | `iam` | [001 — usuários, autenticação e perfis](specs/001-iam-seguranca/spec.md) | ✅ implementado |
 | `cadastros` | [002 — paciente, médico e catálogos](specs/002-cadastros/spec.md) | ✅ implementado |
-| `consultas` | [003](specs/003-consultas/spec.md) | 📄 especificado (Thiago) |
-| `exames` · `resultados` | [004](specs/004-exames/spec.md) · [005](specs/005-resultados/spec.md) | 📄 especificado (Thiago) |
+| `consultas` | [003](specs/003-consultas/spec.md) | ✅ implementado (Thiago) |
+| `exames` · `resultados` | [004](specs/004-exames/spec.md) · [005](specs/005-resultados/spec.md) | ✅ implementado (Thiago) |
 | `pareceres` · `documentos` | [006](specs/006-pareceres/spec.md) · [008](specs/008-documentos/spec.md) | 📄 especificado (Juliana) |
-| `receitas` | [007](specs/007-receitas/spec.md) | 📄 especificado (Thiago) |
+| `receitas` | [007](specs/007-receitas/spec.md) | ✅ implementado (Thiago) |
 | `notificacoes` | [009](specs/009-notificacoes/spec.md) | 📄 especificado (Danilo) |
 
 Build: **68 testes passando** (`mvn verify`), incluindo verificação de fronteiras do Spring

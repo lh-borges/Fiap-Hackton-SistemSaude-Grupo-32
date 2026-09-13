@@ -57,7 +57,7 @@ qualquer repositório e a extração futura fica inviável.
 | `exames` | `br.com.fiap.sus.exames` | Solicitação e realização de exame | Thiago |
 | `resultados` | `br.com.fiap.sus.resultados` | Resultado de imagem e laboratorial + itens | Thiago |
 | `pareceres` | `br.com.fiap.sus.pareceres` | Parecer médico sobre resultado | Juliana |
-| `receitas` | `br.com.fiap.sus.receitas` | Receita e itens de receita | Thiago |
+| `receitas` | `br.com.fiap.sus.resultados` | Receita e itens de receita | Thiago |
 | `documentos` | `br.com.fiap.sus.documentos` | Documento médico | Juliana |
 | `notificacoes` | `br.com.fiap.sus.notificacoes` | Notificação ao usuário, consumidor de eventos | Danilo |
 | `historico` | `br.com.fiap.sus.historico` | Linha do tempo derivada (somente leitura, sem tabela) | Thiago |
