@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
+import br.com.fiap.sus.resultados.api.IndicadorParecerQuery;
 import br.com.fiap.sus.resultados.domain.repository.ResultadoExameFiltro;
 import br.com.fiap.sus.resultados.domain.repository.ResultadoExameRepository;
 import br.com.fiap.sus.shared.domain.PaginaResultado;
@@ -37,11 +38,15 @@ class ListarResultadosUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+    private IndicadorParecerQuery indicadorParecerQuery;
+
     private ListarResultadosUseCase useCase;
 
     @BeforeEach
     void configurar() {
-        useCase = new ListarResultadosUseCase(resultadoExameRepository, cadastroQuery, usuarioAutenticadoProvider);
+        useCase = new ListarResultadosUseCase(resultadoExameRepository, cadastroQuery, usuarioAutenticadoProvider,
+                indicadorParecerQuery);
         when(resultadoExameRepository.listar(any(), anyInt(), anyInt()))
                 .thenReturn(PaginaResultado.de(List.of(), 0, 50, 0));
     }

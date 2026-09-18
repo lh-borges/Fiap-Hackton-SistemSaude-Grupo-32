@@ -9,7 +9,7 @@ import java.util.UUID;
 public record ResultadoExameResponse(UUID id, UUID exameId, UUID pacienteId, TipoResultado tipoResultado,
                                      Instant dataResultado, String observacao, String arquivoUrl,
                                      String descricao, String laudo,
-                                     List<ItemResultadoLaboratorialResponse> itens) {
+                                     List<ItemResultadoLaboratorialResponse> itens, boolean possuiParecer) {
 
     public static ResultadoExameResponse de(ResultadoExameOutput output) {
         List<ItemResultadoLaboratorialResponse> itens = output.itens().stream()
@@ -17,6 +17,6 @@ public record ResultadoExameResponse(UUID id, UUID exameId, UUID pacienteId, Tip
                 .toList();
         return new ResultadoExameResponse(output.id(), output.exameId(), output.pacienteId(),
                 output.tipoResultado(), output.dataResultado(), output.observacao(), output.arquivoUrl(),
-                output.descricao(), output.laudo(), itens);
+                output.descricao(), output.laudo(), itens, output.possuiParecer());
     }
 }

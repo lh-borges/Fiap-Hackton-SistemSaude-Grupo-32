@@ -1,6 +1,7 @@
 package br.com.fiap.sus.resultados.application.usecase;
 
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
+import br.com.fiap.sus.resultados.api.IndicadorParecerQuery;
 import br.com.fiap.sus.resultados.application.dto.ResultadoExameOutput;
 import br.com.fiap.sus.resultados.domain.model.ResultadoExame;
 import br.com.fiap.sus.resultados.domain.repository.ResultadoExameRepository;
@@ -19,13 +20,16 @@ import org.springframework.stereotype.Component;
 public class ConsultarResultadoUseCase {
 
     private final ResultadoExameRepository resultadoExameRepository;
+    private final IndicadorParecerQuery pareceres;
     private final CadastroQuery cadastroQuery;
     private final UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
     public ConsultarResultadoUseCase(ResultadoExameRepository resultadoExameRepository,
                                      CadastroQuery cadastroQuery,
-                                     UsuarioAutenticadoProvider usuarioAutenticadoProvider) {
+                                     UsuarioAutenticadoProvider usuarioAutenticadoProvider,
+                                     IndicadorParecerQuery pareceres) {
         this.resultadoExameRepository = resultadoExameRepository;
+        this.pareceres = pareceres;
         this.cadastroQuery = cadastroQuery;
         this.usuarioAutenticadoProvider = usuarioAutenticadoProvider;
     }
@@ -40,11 +44,10 @@ public class ConsultarResultadoUseCase {
             var pacienteId = cadastroQuery.pacienteIdDoUsuario(usuario.id())
                     .orElseThrow(() -> new RecursoNaoEncontradoException("Paciente nao encontrado para este usuario."));
             if (!resultado.getPacienteId().equals(pacienteId)) {
-                // EX-06: tratado como inexistente, nao como acesso negado.
                 throw new RecursoNaoEncontradoException("Resultado nao encontrado.");
             }
         }
 
-        return ResultadoExameOutput.de(resultado);
+        return ResultadoExameOutput.de(resultado, pareceres.resultadosComParecer(java.util.Set.of(resultadoId)).contains(resultadoId));
     }
 }
