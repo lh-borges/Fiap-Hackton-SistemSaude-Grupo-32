@@ -52,7 +52,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** HTTP real + casos de uso com proxy de seguranca; portas externas mockadas. */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ParecerMedicoControllerTest.Config.class)
 class ParecerMedicoControllerTest {
@@ -266,7 +265,7 @@ class ParecerMedicoControllerTest {
         configurarPaciente();
         mvc.perform(request(HttpMethod.valueOf(metodo), ROTA + "/" + parecer.getId()))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.detail", containsString("imutavel")));
+                .andExpect(jsonPath("$.detail", containsString("imutável")));
         verify(repository, never()).salvar(any(ParecerMedico.class), any(UUID.class));
     }
 

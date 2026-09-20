@@ -31,6 +31,6 @@ public class RejeitarAlteracaoParecerUseCase {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Parecer não encontrado."));
         leitura.verificarAcesso(parecer, usuarios.obrigatorio());
         throw new RegraDeNegocioException(
-                "Parecer médico é único e não pode ser alterado ou excluido. Registre um novo parecer retificador.");
+                "Parecer médico é imutável e não pode ser alterado ou excluido. Registre um novo parecer retificador.");
     }
 }
