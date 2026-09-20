@@ -15,8 +15,11 @@ public class ListarPareceresUseCase {
     private final ParecerLeituraService leitura;
     private final UsuarioAutenticadoProvider usuarios;
 
-    public ListarPareceresUseCase(ParecerMedicoRepository repository, ParecerLeituraService leitura,
-                                  UsuarioAutenticadoProvider usuarios) {
+    public ListarPareceresUseCase(
+            ParecerMedicoRepository repository,
+            ParecerLeituraService leitura,
+            UsuarioAutenticadoProvider usuarios
+    ) {
         this.repository = repository;
         this.leitura = leitura;
         this.usuarios = usuarios;

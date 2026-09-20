@@ -21,10 +21,10 @@ public final class ParecerMedico {
     private ParecerMedico(UUID id, UUID resultadoExameId, UUID pacienteId, UUID medicoId, String descricao,
                           Instant dataParecer) {
         if (isNull(id)) {
-            throw new RegraDeNegocioException("O identificador do parecer e obrigatorio.");
+            throw new RegraDeNegocioException("O identificador do parecer é obrigatório.");
         }
         if (isNull(dataParecer)) {
-            throw new RegraDeNegocioException("A data do parecer e obrigatoria.");
+            throw new RegraDeNegocioException("A data do parecer é obrigatória.");
         }
         if (isNull(resultadoExameId)) {
             throw new RegraDeNegocioException("O parecer deve estar vinculado a um resultado de exame.");
@@ -33,10 +33,10 @@ public final class ParecerMedico {
             throw new RegraDeNegocioException("O parecer deve estar vinculado a um paciente.");
         }
         if (isNull(medicoId)) {
-            throw new RegraDeNegocioException("O parecer deve ter um medico responsavel.");
+            throw new RegraDeNegocioException("O parecer deve ter um médico responsável.");
         }
 
-        String descricaoTratada = descricao == null ? "" : descricao.trim();
+        String descricaoTratada = isNull(descricao) ? "" : descricao.trim();
         if (descricaoTratada.length() < DESCRICAO_MIN || descricaoTratada.length() > DESCRICAO_MAX) {
             throw new RegraDeNegocioException(
                     "A descricao do parecer deve ter entre " + DESCRICAO_MIN + " e " + DESCRICAO_MAX

@@ -29,13 +29,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/pareceres")
 public class ParecerMedicoController {
+
     private final RegistrarParecerUseCase registrar;
     private final ConsultarParecerUseCase consultar;
     private final ListarPareceresUseCase listar;
     private final RejeitarAlteracaoParecerUseCase rejeitarAlteracao;
 
-    public ParecerMedicoController(RegistrarParecerUseCase registrar, ConsultarParecerUseCase consultar,
-                                   ListarPareceresUseCase listar, RejeitarAlteracaoParecerUseCase rejeitarAlteracao) {
+    public ParecerMedicoController(
+            RegistrarParecerUseCase registrar,
+            ConsultarParecerUseCase consultar,
+            ListarPareceresUseCase listar,
+            RejeitarAlteracaoParecerUseCase rejeitarAlteracao
+    ) {
         this.registrar = registrar;
         this.consultar = consultar;
         this.listar = listar;
@@ -47,13 +52,13 @@ public class ParecerMedicoController {
     public ResponseEntity<ParecerMedicoResponse> registrar(@Valid @RequestBody RegistrarParecerRequest request) {
         var criado = registrar.executar(new RegistrarParecerDTO(request.resultadoExameId(), request.descricao()));
         return ResponseEntity.created(URI.create("/api/v1/pareceres/" + criado.id()))
-                .body(ParecerMedicoResponse.de(criado));
+                .body(ParecerMedicoResponse.of(criado));
     }
 
     @Operation(summary = "Consulta parecer", description = "PACIENTE acessa os proprios; MEDICO acessa pacientes atendidos; ADMINISTRADOR recebe metadados.")
     @GetMapping("/{id}")
     public ParecerMedicoResponse consultar(@PathVariable UUID id) {
-        return ParecerMedicoResponse.de(consultar.executar(id));
+        return ParecerMedicoResponse.of(consultar.executar(id));
     }
 
     @Operation(summary = "Lista pareceres com filtros", description = "A restricao de acesso e aplicada antes da paginacao. ATENDENTE nao tem acesso.")
@@ -67,7 +72,7 @@ public class ParecerMedicoController {
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int tamanho) {
         var filtro = new ParecerMedicoFiltro(pacienteId, medicoId, resultadoExameId, periodoInicio, periodoFim);
-        return PaginaResponse.de(listar.executar(filtro, pagina, tamanho), ParecerMedicoResponse::de);
+        return PaginaResponse.of(listar.executar(filtro, pagina, tamanho), ParecerMedicoResponse::of);
     }
 
     @Operation(summary = "Rejeita alteracao ou exclusao", description = "Parecer e imutavel. Retorna 422; recurso inexistente ou de terceiro retorna 404.")

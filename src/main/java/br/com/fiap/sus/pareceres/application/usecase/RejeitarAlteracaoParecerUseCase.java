@@ -9,15 +9,17 @@ import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-/** EX-03: nenhum perfil pode alterar ou excluir pareceres. */
 @Component
 public class RejeitarAlteracaoParecerUseCase {
     private final ParecerMedicoRepository repository;
     private final ParecerLeituraService leitura;
     private final UsuarioAutenticadoProvider usuarios;
 
-    public RejeitarAlteracaoParecerUseCase(ParecerMedicoRepository repository, ParecerLeituraService leitura,
-                                          UsuarioAutenticadoProvider usuarios) {
+    public RejeitarAlteracaoParecerUseCase(
+            ParecerMedicoRepository repository,
+            ParecerLeituraService leitura,
+            UsuarioAutenticadoProvider usuarios
+    ) {
         this.repository = repository;
         this.leitura = leitura;
         this.usuarios = usuarios;
@@ -26,9 +28,9 @@ public class RejeitarAlteracaoParecerUseCase {
     @PreAuthorize("hasAnyRole('MEDICO', 'PACIENTE', 'ADMINISTRADOR')")
     public void executar(UUID parecerId) {
         var parecer = repository.buscarPorId(parecerId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Parecer nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Parecer não encontrado."));
         leitura.verificarAcesso(parecer, usuarios.obrigatorio());
         throw new RegraDeNegocioException(
-                "Parecer medico e imutavel e nao pode ser alterado ou excluido. Registre um novo parecer retificador.");
+                "Parecer médico é único e não pode ser alterado ou excluido. Registre um novo parecer retificador.");
     }
 }

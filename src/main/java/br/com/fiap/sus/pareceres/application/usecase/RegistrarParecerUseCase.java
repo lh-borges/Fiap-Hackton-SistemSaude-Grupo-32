@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 @Component
 public class RegistrarParecerUseCase {
 
@@ -42,17 +44,15 @@ public class RegistrarParecerUseCase {
     public ParecerMedicoOutput executar(RegistrarParecerDTO dto) {
         UsuarioAutenticado usuario = usuarioAutenticadoProvider.obrigatorio();
 
-        // RN-01/RN-07: medico deve existir e estar ativo.
         UUID medicoId = cadastroQuery.medicoIdDoUsuario(usuario.id())
-                .orElseThrow(() -> new RegraDeNegocioException("Usuario nao e um medico cadastrado."));
+                .orElseThrow(() -> new RegraDeNegocioException("Usuario não é um medico cadastrado."));
         var medico = cadastroQuery.resumoDoMedico(medicoId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Medico nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Médico não encontrado."));
         if (!medico.ativo()) {
-            throw new RegraDeNegocioException("Medico inativo nao pode emitir parecer.");
+            throw new RegraDeNegocioException("Médico inativo não pode emitir parecer.");
         }
 
-        // RN-02/EX-02: resultado precisa existir; o paciente e derivado dele (RN-03).
-        if (dto.resultadoExameId() == null) {
+        if (isNull(dto.resultadoExameId())) {
             throw new RegraDeNegocioException("O parecer deve estar vinculado a um resultado de exame.");
         }
         UUID pacienteId = resultadoQuery.pacienteIdDoResultado(dto.resultadoExameId())
@@ -61,7 +61,6 @@ public class RegistrarParecerUseCase {
         ParecerMedico parecer = ParecerMedico.emitir(dto.resultadoExameId(), pacienteId, medicoId, dto.descricao());
         ParecerMedico salvo = parecerMedicoRepository.salvar(parecer, usuario.id());
 
-        // RF-07: publica o fato para o modulo de notificacoes, sem conteudo clinico.
         eventPublisher.publishEvent(new ParecerCriadoEvent(salvo.getId(), salvo.getResultadoExameId(),
                 salvo.getPacienteId(), salvo.getMedicoId(), salvo.getDataParecer()));
 

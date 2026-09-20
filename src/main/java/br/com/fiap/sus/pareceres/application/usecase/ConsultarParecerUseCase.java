@@ -15,8 +15,11 @@ public class ConsultarParecerUseCase {
     private final ParecerLeituraService leitura;
     private final UsuarioAutenticadoProvider usuarios;
 
-    public ConsultarParecerUseCase(ParecerMedicoRepository repository, ParecerLeituraService leitura,
-                                   UsuarioAutenticadoProvider usuarios) {
+    public ConsultarParecerUseCase(
+            ParecerMedicoRepository repository,
+            ParecerLeituraService leitura,
+            UsuarioAutenticadoProvider usuarios
+    ) {
         this.repository = repository;
         this.leitura = leitura;
         this.usuarios = usuarios;
@@ -25,7 +28,7 @@ public class ConsultarParecerUseCase {
     @PreAuthorize("hasAnyRole('MEDICO', 'PACIENTE', 'ADMINISTRADOR')")
     public ParecerMedicoOutput executar(UUID parecerId) {
         var parecer = repository.buscarPorId(parecerId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Parecer nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Parecer não encontrado."));
         var usuario = usuarios.obrigatorio();
         leitura.verificarAcesso(parecer, usuario);
         return leitura.output(parecer, usuario);

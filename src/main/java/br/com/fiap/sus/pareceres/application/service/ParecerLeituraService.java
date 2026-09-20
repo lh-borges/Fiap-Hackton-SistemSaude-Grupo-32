@@ -30,17 +30,17 @@ public class ParecerLeituraService {
         }
         if (usuario.ehPaciente()) {
             return Set.of(cadastros.pacienteIdDoUsuario(usuario.id())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Paciente nao encontrado para este usuario.")));
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Paciente não encontrado para este usuario.")));
         }
         UUID medicoId = cadastros.medicoIdDoUsuario(usuario.id())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Medico nao encontrado para este usuario."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Médico não encontrado para este usuario."));
         return Set.copyOf(consultas.pacientesDoMedico(medicoId));
     }
 
     public void verificarAcesso(ParecerMedico parecer, UsuarioAutenticado usuario) {
         var permitidos = pacientesPermitidos(usuario);
         if (permitidos != null && !permitidos.contains(parecer.getPacienteId())) {
-            throw new RecursoNaoEncontradoException("Parecer nao encontrado.");
+            throw new RecursoNaoEncontradoException("Parecer não encontrado.");
         }
     }
 
@@ -54,9 +54,11 @@ public class ParecerLeituraService {
 
     public ParecerMedicoOutput output(ParecerMedico parecer, UsuarioAutenticado usuario) {
         var medico = cadastros.resumoDoMedico(parecer.getMedicoId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Medico nao encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Médico não encontrado."));
+
         String nome = usuarios.resumoDoUsuario(medico.usuarioId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario do medico nao encontrado.")).nome();
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário do médico não encontrado.")).nome();
+
         return new ParecerMedicoOutput(parecer.getId(), parecer.getResultadoExameId(), parecer.getPacienteId(),
                 parecer.getMedicoId(), medico.especialidadeId(), medico.crm(), nome,
                 usuario.ehAdministrador() ? null : parecer.getDescricao(), parecer.getDataParecer());

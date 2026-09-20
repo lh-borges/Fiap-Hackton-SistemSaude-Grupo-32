@@ -85,7 +85,7 @@ public class UsuarioController {
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int tamanho) {
-        return PaginaResponse.de(listar.executar(termo, role, ativo, pagina, tamanho), UsuarioResponse::de);
+        return PaginaResponse.of(listar.executar(termo, role, ativo, pagina, tamanho), UsuarioResponse::de);
     }
 
     @Operation(summary = "Consulta um usuario",

@@ -39,8 +39,15 @@ public class ParecerMedicoEntity {
     protected ParecerMedicoEntity() {
     }
 
-    public ParecerMedicoEntity(UUID id, UUID resultadoExameId, UUID pacienteId, UUID medicoId, String descricao,
-                               Instant dataParecer, UUID criadoPorUsuarioId) {
+    public ParecerMedicoEntity(
+            UUID id,
+            UUID resultadoExameId,
+            UUID pacienteId,
+            UUID medicoId,
+            String descricao,
+            Instant dataParecer,
+            UUID criadoPorUsuarioId
+    ) {
         this.criadoPorUsuarioId = criadoPorUsuarioId;
         this.id = id;
         this.resultadoExameId = resultadoExameId;

@@ -8,10 +8,14 @@ import java.util.UUID;
 
 @Schema(name = "RegistrarParecerRequest")
 public record RegistrarParecerRequest(
-        @NotNull(message = "O resultado do exame e obrigatorio.")
-        @Schema(description = "Identificador do resultado a ser interpretado") UUID resultadoExameId,
-        @NotBlank(message = "A descricao do parecer e obrigatoria.")
+
+        @NotNull(message = "O resultado do exame é obrigatório.")
+        @Schema(description = "Identificador do resultado a ser interpretado")
+        UUID resultadoExameId,
+
+        @NotBlank(message = "A descricao do parecer é obrigatória.")
         @Size(min = 10, max = 5000, message = "A descricao deve ter entre 10 e 5000 caracteres.")
         @Schema(description = "Interpretacao clinica do medico", minLength = 10, maxLength = 5000)
-        String descricao) {
+        String descricao
+) {
 }

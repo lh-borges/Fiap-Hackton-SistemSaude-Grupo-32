@@ -13,7 +13,7 @@ public record PaginaResponse<T>(
         @Schema(description = "Total de itens encontrados", example = "42") long totalElementos,
         @Schema(description = "Total de paginas", example = "3") int totalPaginas) {
 
-    public static <D, R> PaginaResponse<R> de(PaginaResultado<D> pagina, Function<D, R> conversor) {
+    public static <D, R> PaginaResponse<R> of(PaginaResultado<D> pagina, Function<D, R> conversor) {
         return new PaginaResponse<>(pagina.conteudo().stream().map(conversor).toList(),
                 pagina.pagina(), pagina.tamanho(), pagina.totalElementos(), pagina.totalPaginas());
     }

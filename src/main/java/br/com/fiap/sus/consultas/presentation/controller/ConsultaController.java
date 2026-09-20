@@ -105,6 +105,6 @@ public class ConsultaController {
             @RequestParam(defaultValue = "50") int tamanho) {
         ConsultaFiltro filtro = new ConsultaFiltro(pacienteId, medicoId, unidadeSaudeId, situacao,
                 periodoInicio, periodoFim);
-        return PaginaResponse.de(listar.executar(filtro, pagina, tamanho), ConsultaResponse::de);
+        return PaginaResponse.of(listar.executar(filtro, pagina, tamanho), ConsultaResponse::de);
     }
 }

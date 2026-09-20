@@ -19,7 +19,7 @@ public record ParecerMedicoResponse(
         @Schema(description = "Descricao clinica; omitida na consulta administrativa") String descricao,
         Instant dataParecer) {
 
-    public static ParecerMedicoResponse de(ParecerMedicoOutput output) {
+    public static ParecerMedicoResponse of(ParecerMedicoOutput output) {
         return new ParecerMedicoResponse(output.id(), output.resultadoExameId(), output.pacienteId(),
                 output.medicoId(), output.idEspecialidade(), output.medicoCrm(), output.medicoNome(),
                 output.descricao(), output.dataParecer());

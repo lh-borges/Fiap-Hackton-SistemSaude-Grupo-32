@@ -8,12 +8,15 @@ import br.com.fiap.sus.pareceres.infrastructure.persistence.mapper.ParecerPersis
 import br.com.fiap.sus.shared.domain.PaginaResultado;
 import jakarta.persistence.EntityManager;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import static java.util.Objects.requireNonNull;
 
 @Repository
 @Transactional(readOnly = true)
@@ -22,8 +25,11 @@ public class ParecerMedicoRepositoryAdapter implements ParecerMedicoRepository {
     private final ParecerPersistenceMapper mapper;
     private final EntityManager entityManager;
 
-    public ParecerMedicoRepositoryAdapter(ParecerMedicoJpaRepository repository,
-                                          ParecerPersistenceMapper mapper, EntityManager entityManager) {
+    public ParecerMedicoRepositoryAdapter(
+            ParecerMedicoJpaRepository repository,
+            ParecerPersistenceMapper mapper,
+            EntityManager entityManager
+    ) {
         this.repository = repository;
         this.mapper = mapper;
         this.entityManager = entityManager;
@@ -32,13 +38,12 @@ public class ParecerMedicoRepositoryAdapter implements ParecerMedicoRepository {
     @Override
     @Transactional
     public ParecerMedico salvar(ParecerMedico parecer, UUID criadoPorUsuarioId) {
-        // Parecer e imutavel: persist insere; merge permitiria sobrescrever um registro.
-        entityManager.persist(mapper.paraEntidade(parecer, java.util.Objects.requireNonNull(criadoPorUsuarioId, "Usuario emissor obrigatorio.")));
+        entityManager.persist(mapper.paraEntidade(parecer, requireNonNull(criadoPorUsuarioId, "Usuário emissor é obrigatório.")));
         return parecer;
     }
 
     @Override
-    public java.util.Set<UUID> resultadosComParecer(java.util.Set<UUID> ids) {
+    public Set<UUID> resultadosComParecer(Set<UUID> ids) {
         return ids.isEmpty() ? java.util.Set.of() : repository.resultadosComParecer(ids);
     }
 
