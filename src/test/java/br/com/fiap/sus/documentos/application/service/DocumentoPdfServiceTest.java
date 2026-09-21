@@ -155,7 +155,7 @@ class DocumentoPdfServiceTest {
         String texto = textoDoPdf(service.gerar(documento));
 
         assertThat(texto).contains("Laudo M", "Informa", "Laudo e conclus",
-                "Exame: " + exameId, "Tipo de exame: Raio-X de torax",
+                "Dados do exame e resultado", "Tipo de exame: Raio-X de torax",
                 "Data de realizacao do exame: 20/09/2026 09:00",
                 "Tipo do resultado: IMAGEM",
                 "Data do resultado: 21/09/2026 00:00",

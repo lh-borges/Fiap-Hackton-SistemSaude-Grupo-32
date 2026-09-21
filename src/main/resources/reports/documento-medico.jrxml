@@ -100,60 +100,71 @@
                 </textElement>
                 <textFieldExpression><![CDATA[$P{secaoEspecifica}]]></textFieldExpression>
             </textField>
+            <line>
+                <reportElement x="0" y="22" width="515" height="1" uuid="bd708271-dc96-42d1-8a93-2019f97d92e3"/>
+            </line>
             <textField>
-                <reportElement x="0" y="24" width="250" height="16" uuid="4b5be2e7-4884-42a9-b370-5210f61bca66"/>
+                <reportElement x="0" y="28" width="515" height="16" uuid="4b5be2e7-4884-42a9-b370-5210f61bca66"/>
                 <textElement>
                     <font size="10" isBold="true"/>
                 </textElement>
                 <textFieldExpression><![CDATA[$P{rotuloConteudo} + ":"]]></textFieldExpression>
             </textField>
-            <textField>
-                <reportElement x="265" y="24" width="250" height="16" uuid="84bc0b74-73b6-4b1a-b1df-c0e1f56976d5">
-                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
-                </reportElement>
-                <textFieldExpression><![CDATA["Exame: " + $P{exameId}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="265" y="42" width="250" height="16" uuid="602bf1e4-8b72-4e26-8175-dd6ca51f630d">
-                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
-                </reportElement>
-                <textFieldExpression><![CDATA["Tipo de exame: " + $P{tipoExameNome}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="265" y="60" width="250" height="16" uuid="d5732977-02d7-4870-b3b8-4ca4f6fa1d31">
-                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
-                </reportElement>
-                <textFieldExpression><![CDATA["Data de realizacao do exame: " + $P{dataRealizacaoExame}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="265" y="78" width="250" height="16" uuid="307b89f8-4eec-4a0f-a47e-8ebf99f7c0f3">
-                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
-                </reportElement>
-                <textFieldExpression><![CDATA["Tipo do resultado: " + $P{tipoResultado}]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="265" y="96" width="250" height="16" uuid="ad72f6c8-20dd-44f5-bd46-32df86a8a445">
-                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
-                </reportElement>
-                <textFieldExpression><![CDATA["Data do resultado: " + $P{dataResultado}]]></textFieldExpression>
-            </textField>
             <textField textAdjust="StretchHeight">
-                <reportElement x="0" y="118" width="515" height="122" positionType="Float" uuid="2c13efc8-7b50-45f6-82f0-b48c2297ecf5"/>
+                <reportElement x="0" y="48" width="515" height="64" positionType="Float" uuid="2c13efc8-7b50-45f6-82f0-b48c2297ecf5"/>
                 <textElement>
                     <font size="11"/>
                     <paragraph lineSpacing="1_1_2"/>
                 </textElement>
                 <textFieldExpression><![CDATA[$P{conteudo}]]></textFieldExpression>
             </textField>
+            <rectangle>
+                <reportElement x="0" y="130" width="515" height="126" positionType="Float" uuid="90863878-f5ee-4188-9faa-dfd068121b61">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+            </rectangle>
+            <textField>
+                <reportElement x="12" y="142" width="491" height="16" positionType="Float" uuid="0f69990b-56a8-4a74-b7fd-6037d00a1b68">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+                <textElement>
+                    <font size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Dados do exame e resultado"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="12" y="164" width="235" height="16" positionType="Float" uuid="602bf1e4-8b72-4e26-8175-dd6ca51f630d">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+                <textFieldExpression><![CDATA["Tipo de exame: " + $P{tipoExameNome}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="268" y="164" width="235" height="16" positionType="Float" uuid="d5732977-02d7-4870-b3b8-4ca4f6fa1d31">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+                <textFieldExpression><![CDATA["Data de realizacao do exame: " + $P{dataRealizacaoExame}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="12" y="184" width="235" height="16" positionType="Float" uuid="307b89f8-4eec-4a0f-a47e-8ebf99f7c0f3">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+                <textFieldExpression><![CDATA["Tipo do resultado: " + $P{tipoResultado}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="268" y="184" width="235" height="16" positionType="Float" uuid="ad72f6c8-20dd-44f5-bd46-32df86a8a445">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+                <textFieldExpression><![CDATA["Data do resultado: " + $P{dataResultado}]]></textFieldExpression>
+            </textField>
             <textField textAdjust="StretchHeight" isBlankWhenNull="true">
-                <reportElement x="0" y="252" width="515" height="72" positionType="Float" uuid="316fd8d0-e810-4228-a3fd-c92c04cb188d">
+                <reportElement x="12" y="210" width="491" height="38" positionType="Float" uuid="316fd8d0-e810-4228-a3fd-c92c04cb188d">
                     <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
                 </reportElement>
                 <textElement>
                     <font size="10"/>
                     <paragraph lineSpacing="1_1_2"/>
                 </textElement>
-                <textFieldExpression><![CDATA["Resultado registrado:\nDescricao: " + $P{descricaoResultado} + "\nLaudo do resultado: " + $P{laudoResultado} + "\nObservacao: " + $P{observacaoResultado} + "\nArquivo do resultado: " + $P{arquivoResultadoUrl}]]></textFieldExpression>
+                <textFieldExpression><![CDATA["Descricao: " + $P{descricaoResultado} + "\nLaudo do resultado: " + $P{laudoResultado} + "\nObservacao: " + $P{observacaoResultado} + "\nArquivo do resultado: " + $P{arquivoResultadoUrl}]]></textFieldExpression>
             </textField>
             <textField textAdjust="StretchHeight" isBlankWhenNull="true">
                 <reportElement x="0" y="344" width="515" height="70" positionType="Float" uuid="86841095-fd13-4761-89c2-67b3085b0387">

@@ -5,12 +5,12 @@
 | 000 | Plataforma (spec-mãe) | todos | Luis | Aprovada | [spec](000-plataforma-sus/spec.md) | [plan](000-plataforma-sus/plan.md) | — |
 | 001 | Usuários, autenticação e perfis | `iam` | Luis | ✅ Implementada | [spec](001-iam-seguranca/spec.md) | [plan](001-iam-seguranca/plan.md) | [tasks](001-iam-seguranca/tasks.md) |
 | 002 | Cadastros e catálogos | `cadastros` | Luis | ✅ Implementada | [spec](002-cadastros/spec.md) | [plan](002-cadastros/plan.md) | [tasks](002-cadastros/tasks.md) |
-| 003 | Consultas | `consultas` | Thiago | Em revisão | [spec](003-consultas/spec.md) | — | — |
-| 004 | Solicitação e realização de exames | `exames` | Thiago | Em revisão | [spec](004-exames/spec.md) | — | — |
-| 005 | Resultados de exame | `resultados` | Thiago | Em revisão | [spec](005-resultados/spec.md) | — | — |
-| 006 | Parecer médico | `pareceres` | Juliana | Em revisão | [spec](006-pareceres/spec.md) | — | — |
-| 007 | Receitas | `receitas` | Thiago | Em revisão | [spec](007-receitas/spec.md) | — | — |
-| 008 | Documentos médicos | `documentos` | Juliana | Em revisão | [spec](008-documentos/spec.md) | — | — |
+| 003 | Consultas | `consultas` | Thiago | ✅ Implementada | [spec](003-consultas/spec.md) | — | — |
+| 004 | Solicitação e realização de exames | `exames` | Thiago | ✅ Implementada | [spec](004-exames/spec.md) | — | — |
+| 005 | Resultados de exame | `resultados` | Thiago | ✅ Implementada | [spec](005-resultados/spec.md) | — | — |
+| 006 | Parecer médico | `pareceres` | Juliana | ✅ Implementada | [spec](006-pareceres/spec.md) | — | — |
+| 007 | Receitas | `receitas` | Thiago | ✅ Implementada | [spec](007-receitas/spec.md) | — | — |'
+| 008 | Documentos médicos | `documentos` | Juliana | ✅ Implementada | [spec](008-documentos/spec.md) | — | — |
 | 009 | Notificações | `notificacoes` | Danilo | Em revisão | [spec](009-notificacoes/spec.md) | — | — |
 
 ## Documentos transversais
