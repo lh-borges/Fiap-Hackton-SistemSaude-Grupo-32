@@ -123,7 +123,8 @@ class ParecerMedicoRepositoryAdapterTest {
         when(usuarios.obrigatorio()).thenReturn(new UsuarioAutenticado(usuario, "Dra. Maria", Set.of("MEDICO")));
         when(cadastros.medicoIdDoUsuario(usuario)).thenReturn(Optional.of(medico));
         when(cadastros.resumoDoMedico(medico)).thenReturn(Optional.of(
-                new MedicoResumo(medico, usuario, "1234", "SP", UUID.randomUUID(), true)));
+                new MedicoResumo(medico, usuario, "Dra. Maria", "medico@sus.gov.br",
+                        "1234", "SP", UUID.randomUUID(), "Clinica Geral", true)));
         var registrar = new RegistrarParecerUseCase(repository, resultados, cadastros, usuarios, mock(ApplicationEventPublisher.class));
         var output = registrar.executar(new RegistrarParecerDTO(resultado, "Interpretacao do resultado."));
         entityManager.flush();

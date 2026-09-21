@@ -143,6 +143,21 @@
       "key": "senhaMedico",
       "value": "Medico@123",
       "type": "string"
+    },
+    {
+      "key": "documentoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "consultaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tipoDocumento",
+      "value": "ATESTADO",
+      "type": "string"
     }
   ],
   "item": [
@@ -559,7 +574,8 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('201 Created', () => pm.response.to.have.status(201));",
-                  "pm.collectionVariables.set('pacienteId', pm.response.json().id);"
+                  "pm.collectionVariables.set('pacienteId', pm.response.json().id);",
+                  "pm.environment.set('pacienteId', pm.response.json().id);"
                 ]
               }
             }
@@ -1188,7 +1204,261 @@
       ]
     },
     {
-      "name": "9. Exames",
+      "name": "9. Consultas",
+      "item": [
+        {
+          "name": "Agendar consulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201 Created\", () => pm.response.to.have.status(201));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"devolve id\", () => pm.expect(corpo.id).to.be.a(\"string\").and.not.empty);",
+                  "pm.collectionVariables.set(\"consultaId\", corpo.id);",
+                  "pm.environment.set(\"consultaId\", corpo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{pacienteId}}\",\n  \"medicoId\": \"{{medicoId}}\",\n  \"unidadeSaudeId\": \"{{unidadeSaudeId}}\",\n  \"dataHora\": \"2036-03-20T09:30:00Z\",\n  \"motivo\": \"Avaliacao clinica e acompanhamento do paciente.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consultas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "consultas"
+              ]
+            },
+            "description": "Exige ADMINISTRADOR/ATENDENTE ou PACIENTE para si. Salva consultaId automaticamente."
+          }
+        },
+        {
+          "name": "Listar consultas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consultas?pacienteId={{pacienteId}}&pagina=0&tamanho=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "consultas"
+              ],
+              "query": [
+                {
+                  "key": "pacienteId",
+                  "value": "{{pacienteId}}"
+                },
+                {
+                  "key": "pagina",
+                  "value": "0"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Lista consultas com paginação e filtro por paciente."
+          }
+        },
+        {
+          "name": "Remarcar consulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"novaDataHora\": \"2036-03-22T15:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consultas/{{consultaId}}/remarcar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "consultas",
+                "{{consultaId}}",
+                "remarcar"
+              ]
+            },
+            "description": "Remarca a consulta agendada para nova data futura."
+          }
+        },
+        {
+          "name": "Cancelar consulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivoCancelamento\": \"Paciente solicitou cancelamento por motivo pessoal.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consultas/{{consultaId}}/cancelar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "consultas",
+                "{{consultaId}}",
+                "cancelar"
+              ]
+            },
+            "description": "Cancela consulta com motivo obrigatório."
+          }
+        },
+        {
+          "name": "Registrar realizacao da consulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"observacoes\": \"Paciente avaliado, orientacoes repassadas e acompanhamento indicado.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consultas/{{consultaId}}/realizar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "consultas",
+                "{{consultaId}}",
+                "realizar"
+              ]
+            },
+            "description": "Usar em consulta já ocorrida, com médico responsável autenticado."
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Exames",
       "item": [
         {
           "name": "Agendar exame",
@@ -1315,7 +1585,7 @@
       ]
     },
     {
-      "name": "10. Resultados de exame",
+      "name": "11. Resultados de exame",
       "item": [
         {
           "name": "Registrar resultado de imagem",
@@ -1410,7 +1680,7 @@
       ]
     },
     {
-      "name": "11. Pareceres",
+      "name": "12. Pareceres",
       "item": [
         {
           "name": "Registrar parecer medico",
@@ -1564,7 +1834,435 @@
       ]
     },
     {
-      "name": "12. Testes de seguranca",
+      "name": "13. Documentos medicos",
+      "item": [
+        {
+          "name": "Emitir documento medico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"201 Created\", () => pm.response.to.have.status(201));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"devolve id\", () => pm.expect(corpo.id).to.be.a(\"string\").and.not.empty);",
+                  "pm.test(\"documento emitido\", () => pm.expect(corpo.situacao).to.eql(\"EMITIDO\"));",
+                  "if (pm.collectionVariables.get(\"tipoDocumento\") === \"LAUDO\" || pm.environment.get(\"tipoDocumento\") === \"LAUDO\") {",
+                  "    pm.test(\"laudo contem dados do exame\", () => {",
+                  "        pm.expect(corpo.tipoExameNome).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(corpo.dataRealizacaoExame).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(corpo.dadosEspecificos.tipo).to.eql(\"LAUDO_EXAME\");",
+                  "    });",
+                  "}",
+                  "pm.collectionVariables.set(\"documentoId\", corpo.id);",
+                  "pm.environment.set(\"documentoId\", corpo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "documentos"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{pacienteId}}\",\n  \"tipo\": \"{{tipoDocumento}}\",\n  \"conteudo\": \"Atesto, para os devidos fins, que o paciente necessita de acompanhamento clinico conforme avaliacao medica realizada.\",\n  \"consultaId\": \"{{consultaId}}\",\n  \"exameId\": \"{{exameId}}\"\n}"
+            },
+            "description": "Exige MEDICO. Salva documentoId para consulta, PDF, cancelamento e testes de imutabilidade. Para LAUDO, use tipoDocumento=LAUDO e mantenha exameId preenchido pelo fluxo de exames realizados; para documento sem exame, remova exameId do body."
+          }
+        },
+        {
+          "name": "Listar documentos medicos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"resposta paginada\", () => pm.expect(corpo).to.have.property(\"conteudo\"));",
+                  "pm.test(\"listagem nao expoe conteudo clinico\", () => {",
+                  "    const primeiro = (corpo.conteudo || [])[0];",
+                  "    if (primeiro) pm.expect(primeiro).to.not.have.property(\"conteudo\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos?pagina=0&tamanho=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "documentos"
+              ],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "0"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "20"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Lista metadados dos documentos. Aceita filtros pacienteId, medicoId, tipo, periodoInicio e periodoFim."
+          }
+        },
+        {
+          "name": "Listar documentos por tipo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos?tipo={{tipoDocumento}}&pagina=0&tamanho=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "documentos"
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "{{tipoDocumento}}"
+                },
+                {
+                  "key": "pagina",
+                  "value": "0"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "20"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consultar documento por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"id confere\", () => pm.expect(corpo.id).to.eql(pm.collectionVariables.get(\"documentoId\") || pm.environment.get(\"documentoId\")));",
+                  "pm.test(\"consulta completa inclui conteudo\", () => pm.expect(corpo.conteudo).to.be.a(\"string\").and.not.empty);",
+                  "pm.test(\"response amigavel nao expoe ids relacionais\", () => {",
+                  "    pm.expect(corpo).to.not.have.property(\"consultaId\");",
+                  "    pm.expect(corpo).to.not.have.property(\"exameId\");",
+                  "    pm.expect(corpo).to.not.have.property(\"tipoExameId\");",
+                  "    pm.expect(corpo).to.not.have.property(\"pacienteId\");",
+                  "    pm.expect(corpo).to.not.have.property(\"medicoId\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/{{documentoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "{{documentoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Paciente consulta proprio documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"paciente consegue ler o proprio documento\", () => {",
+                  "    pm.expect(corpo.id).to.eql(pm.collectionVariables.get(\"documentoId\") || pm.environment.get(\"documentoId\"));",
+                  "    pm.expect(corpo.conteudo).to.be.a(\"string\").and.not.empty;",
+                  "    pm.expect(corpo.pacienteNome).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "pm.test(\"response amigavel nao expoe ids relacionais\", () => {",
+                  "    pm.expect(corpo).to.not.have.property(\"consultaId\");",
+                  "    pm.expect(corpo).to.not.have.property(\"exameId\");",
+                  "    pm.expect(corpo).to.not.have.property(\"tipoExameId\");",
+                  "    pm.expect(corpo).to.not.have.property(\"pacienteId\");",
+                  "    pm.expect(corpo).to.not.have.property(\"medicoId\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/{{documentoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "{{documentoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPaciente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Use depois de obter tokenPaciente no fluxo de autenticacao/cadastro."
+          }
+        },
+        {
+          "name": "Baixar PDF do documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"content-type pdf\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"content-disposition com arquivo\", () => pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"documento-\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/{{documentoId}}/pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "{{documentoId}}",
+                "pdf"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Gera o PDF via JasperReports."
+          }
+        },
+        {
+          "name": "Alterar documento deve responder 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"422 Unprocessable Entity\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"explica imutabilidade\", () => pm.expect(pm.response.text()).to.include(\"imutavel\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/{{documentoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "{{documentoId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conteudo\": \"Tentativa de alteracao nao permitida.\"\n}"
+            },
+            "description": "Documento emitido e imutavel; a API deve rejeitar alteracao."
+          }
+        },
+        {
+          "name": "Cancelar documento medico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"documento cancelado\", () => pm.expect(corpo.situacao).to.eql(\"CANCELADO\"));",
+                  "pm.test(\"motivo registrado\", () => pm.expect(corpo.motivoCancelamento).to.include(\"duplicidade\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/{{documentoId}}/cancelar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "{{documentoId}}",
+                "cancelar"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Documento emitido em duplicidade durante teste integrado.\"\n}"
+            },
+            "description": "Exige MEDICO autor do documento."
+          }
+        }
+      ]
+    },
+    {
+      "name": "14. Testes de seguranca",
       "description": "Demonstra o Artigo IV da constituicao: negar por padrao, autorizacao por perfil e posse do dado.",
       "item": [
         {

@@ -44,7 +44,7 @@ public class IamQueryService implements IamQuery {
     }
 
     private UsuarioResumo converter(Usuario usuario) {
-        return new UsuarioResumo(usuario.getId(), usuario.getNome(), usuario.getEmail().valor(),
+        return new UsuarioResumo(usuario.getId(), usuario.getNome(), usuario.getCpf().formatado(), usuario.getEmail().valor(),
                 usuario.isAtivo(), usuario.getRoles().stream().map(Enum::name).collect(Collectors.toSet()));
     }
 

@@ -2,6 +2,8 @@ package br.com.fiap.sus.consultas.infrastructure.persistence.repository;
 
 import br.com.fiap.sus.consultas.api.ConsultaQuery;
 import br.com.fiap.sus.consultas.domain.enums.SituacaoConsulta;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
@@ -19,5 +21,15 @@ public class ConsultaQueryAdapter implements ConsultaQuery {
     @Override
     public Set<UUID> pacientesDoMedico(UUID medicoId) {
         return repository.pacientesDoMedico(medicoId, SituacaoConsulta.CANCELADA);
+    }
+
+    @Override
+    public Optional<UUID> pacienteIdDaConsulta(UUID consultaId) {
+        return repository.pacienteIdDaConsulta(consultaId);
+    }
+
+    @Override
+    public Optional<Instant> dataHoraDaConsulta(UUID consultaId) {
+        return repository.dataHoraDaConsulta(consultaId);
     }
 }

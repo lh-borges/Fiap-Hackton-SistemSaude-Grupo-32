@@ -102,9 +102,11 @@ class ParecerMedicoControllerTest {
     void configurarAutor() {
         when(cadastros.medicoIdDoUsuario(usuario)).thenReturn(Optional.of(medico));
         when(cadastros.resumoDoMedico(medico)).thenReturn(Optional.of(
-                new MedicoResumo(medico, usuario, "12345", "SP", especialidade, true)));
+                new MedicoResumo(medico, usuario, "Dra. Maria", "teste@example.org",
+                        "12345", "SP", especialidade, "SP", true)));
         when(iam.resumoDoUsuario(usuario)).thenReturn(Optional.of(
-                new UsuarioResumo(usuario, "Dra. Maria", "teste@example.org", true, Set.of("MEDICO"))));
+                new UsuarioResumo(usuario, "Dra. Maria", "111.444.777-35",
+                        "teste@example.org", true, Set.of("MEDICO"))));
     }
 
     void configurarPaciente() {

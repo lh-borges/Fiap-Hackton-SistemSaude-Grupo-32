@@ -1,6 +1,8 @@
 package br.com.fiap.sus.consultas.infrastructure.persistence.repository;
 
 import br.com.fiap.sus.consultas.infrastructure.persistence.entity.ConsultaEntity;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.Set;
 import br.com.fiap.sus.consultas.domain.enums.SituacaoConsulta;
@@ -13,4 +15,10 @@ public interface ConsultaJpaRepository
         extends JpaRepository<ConsultaEntity, UUID>, JpaSpecificationExecutor<ConsultaEntity> {
     @Query("select distinct c.pacienteId from ConsultaEntity c where c.medicoId = :medicoId and c.situacao <> :excluida")
     Set<UUID> pacientesDoMedico(@Param("medicoId") UUID medicoId, @Param("excluida") SituacaoConsulta excluida);
+
+    @Query("select c.pacienteId from ConsultaEntity c where c.id = :consultaId")
+    Optional<UUID> pacienteIdDaConsulta(@Param("consultaId") UUID consultaId);
+
+    @Query("select c.dataHora from ConsultaEntity c where c.id = :consultaId")
+    Optional<Instant> dataHoraDaConsulta(@Param("consultaId") UUID consultaId);
 }

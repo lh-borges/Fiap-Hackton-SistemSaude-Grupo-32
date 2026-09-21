@@ -47,7 +47,8 @@ class RegistrarParecerUseCaseTest {
 
     void medicoAtivo(boolean ativo) {
         when(cadastros.resumoDoMedico(medico))
-                .thenReturn(Optional.of(new MedicoResumo(medico, usuario, "12345", "SP", especialidade, ativo)));
+                .thenReturn(Optional.of(new MedicoResumo(medico, usuario, "Dra. Maria",
+                        "medico@sus.gov.br", "12345", "SP", especialidade, "Clinica Geral", ativo)));
     }
 
     @Test

@@ -54,9 +54,11 @@ class LeituraParecerUseCaseTest {
 
     void autor() {
         when(cadastros.resumoDoMedico(medico)).thenReturn(Optional.of(
-                new MedicoResumo(medico, autorUsuario, "1234", "SP", UUID.randomUUID(), false)));
+                new MedicoResumo(medico, autorUsuario, "Dra. Maria", "teste@example.org",
+                        "1234", "SP", UUID.randomUUID(), "Clinica Geral", false)));
         when(iam.resumoDoUsuario(autorUsuario)).thenReturn(Optional.of(
-                new UsuarioResumo(autorUsuario, "Dra. Maria", "teste@example.org", false, Set.of("MEDICO"))));
+                new UsuarioResumo(autorUsuario, "Dra. Maria", "111.444.777-35",
+                        "teste@example.org", false, Set.of("MEDICO"))));
     }
 
     @Test
