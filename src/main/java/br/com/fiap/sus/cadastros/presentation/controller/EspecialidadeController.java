@@ -54,7 +54,7 @@ public class EspecialidadeController {
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "50") int tamanho) {
-        return PaginaResponse.de(listar.executar(ativo, pagina, tamanho), EspecialidadeResponse::de);
+        return PaginaResponse.of(listar.executar(ativo, pagina, tamanho), EspecialidadeResponse::de);
     }
 
     @Operation(summary = "Inativa uma especialidade", description = "Exige ADMINISTRADOR.")

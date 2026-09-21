@@ -57,7 +57,7 @@ public class TipoExameController {
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "50") int tamanho) {
-        return PaginaResponse.de(listar.executar(categoria, ativo, pagina, tamanho), TipoExameResponse::de);
+        return PaginaResponse.of(listar.executar(categoria, ativo, pagina, tamanho), TipoExameResponse::de);
     }
 
     @Operation(summary = "Inativa um tipo de exame", description = "Exige ADMINISTRADOR.")

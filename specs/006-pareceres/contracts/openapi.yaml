@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: Pareceres medicos - Sistema SUS
+  version: 1.0.0
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/pareceres:
+    post:
+      operationId: registrarParecer
+      summary: Registra parecer como medico ativo
+      description: Paciente e derivado do resultado; autor e data sao definidos pelo servidor.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrarParecerRequest'
+      responses:
+        '201':
+          description: Parecer criado
+          headers:
+            Location:
+              schema: {type: string}
+              description: Endereco do parecer criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParecerMedicoResponse'
+        '400': {$ref: '#/components/responses/EntradaInvalida'}
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '403': {$ref: '#/components/responses/AcessoNegado'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+        '422': {$ref: '#/components/responses/RegraDeNegocio'}
+    get:
+      operationId: listarPareceres
+      summary: Lista pareceres conforme o perfil e o vinculo assistencial
+      description: Paciente so recebe registros proprios; medico so recebe pacientes atendidos; administrador recebe metadados sem descricao.
+      parameters:
+        - {name: pacienteId, in: query, schema: {type: string, format: uuid}}
+        - {name: medicoId, in: query, schema: {type: string, format: uuid}}
+        - {name: resultadoExameId, in: query, schema: {type: string, format: uuid}}
+        - {name: periodoInicio, in: query, schema: {type: string, format: date-time}}
+        - {name: periodoFim, in: query, schema: {type: string, format: date-time}}
+        - {name: pagina, in: query, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: tamanho, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+      responses:
+        '200':
+          description: Pagina de pareceres autorizados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaPareceres'
+        '400': {$ref: '#/components/responses/EntradaInvalida'}
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '403': {$ref: '#/components/responses/AcessoNegado'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+  /api/v1/pareceres/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+    get:
+      operationId: consultarParecer
+      summary: Consulta parecer autorizado
+      responses:
+        '200':
+          description: Parecer ou metadados administrativos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParecerMedicoResponse'
+        '400': {$ref: '#/components/responses/EntradaInvalida'}
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '403': {$ref: '#/components/responses/AcessoNegado'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+    put:
+      operationId: rejeitarSubstituicaoParecer
+      summary: Rejeita substituicao por imutabilidade
+      responses:
+        '400': {$ref: '#/components/responses/EntradaInvalida'}
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '403': {$ref: '#/components/responses/AcessoNegado'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+        '422': {$ref: '#/components/responses/RegraDeNegocio'}
+    patch:
+      operationId: rejeitarAlteracaoParecer
+      summary: Rejeita alteracao por imutabilidade
+      responses:
+        '400': {$ref: '#/components/responses/EntradaInvalida'}
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '403': {$ref: '#/components/responses/AcessoNegado'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+        '422': {$ref: '#/components/responses/RegraDeNegocio'}
+    delete:
+      operationId: rejeitarExclusaoParecer
+      summary: Rejeita exclusao por imutabilidade
+      responses:
+        '400': {$ref: '#/components/responses/EntradaInvalida'}
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '403': {$ref: '#/components/responses/AcessoNegado'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+        '422': {$ref: '#/components/responses/RegraDeNegocio'}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+  schemas:
+    RegistrarParecerRequest:
+      type: object
+      required: [resultadoExameId, descricao]
+      properties:
+        resultadoExameId: {type: string, format: uuid}
+        descricao: {type: string, minLength: 10, maxLength: 5000}
+    ParecerMedicoResponse:
+      type: object
+      required: [id, resultadoExameId, pacienteId, medicoId, medicoCrm, medicoNome, dataParecer]
+      properties:
+        id: {type: string, format: uuid}
+        resultadoExameId: {type: string, format: uuid}
+        pacienteId: {type: string, format: uuid}
+        medicoId: {type: string, format: uuid}
+        idEspecialidade: {type: string, format: uuid}
+        medicoCrm: {type: string}
+        medicoNome: {type: string}
+        descricao:
+          type: string
+          description: Conteudo clinico omitido para ADMINISTRADOR
+        dataParecer: {type: string, format: date-time}
+    PaginaPareceres:
+      type: object
+      required: [conteudo, pagina, tamanho, totalElementos, totalPaginas]
+      properties:
+        conteudo:
+          type: array
+          items: {$ref: '#/components/schemas/ParecerMedicoResponse'}
+        pagina: {type: integer}
+        tamanho: {type: integer}
+        totalElementos: {type: integer, format: int64}
+        totalPaginas: {type: integer}
+    Problema:
+      type: object
+      properties:
+        type: {type: string, format: uri}
+        title: {type: string}
+        status: {type: integer}
+        detail: {type: string}
+        instance: {type: string}
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              campo: {type: string}
+              mensagem: {type: string}
+  responses:
+    EntradaInvalida:
+      description: Entrada invalida
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    NaoAutenticado:
+      description: Autenticacao obrigatoria
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    AcessoNegado:
+      description: Perfil sem permissao
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    NaoEncontrado:
+      description: Recurso inexistente ou nao acessivel ao titular
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    RegraDeNegocio:
+      description: Regra violada; alteracao e exclusao sao negadas por imutabilidade
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}

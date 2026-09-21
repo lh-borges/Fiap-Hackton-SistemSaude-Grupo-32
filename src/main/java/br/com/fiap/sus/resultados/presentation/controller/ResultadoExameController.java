@@ -88,6 +88,6 @@ public class ResultadoExameController {
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "50") int tamanho) {
         ResultadoExameFiltro filtro = new ResultadoExameFiltro(pacienteId, periodoInicio, periodoFim);
-        return PaginaResponse.de(listar.executar(filtro, pagina, tamanho), ResultadoExameResponse::de);
+        return PaginaResponse.of(listar.executar(filtro, pagina, tamanho), ResultadoExameResponse::de);
     }
 }

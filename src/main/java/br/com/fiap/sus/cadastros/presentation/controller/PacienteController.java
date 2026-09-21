@@ -71,7 +71,7 @@ public class PacienteController {
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int tamanho) {
-        return PaginaResponse.de(listar.executar(termo, ativo, pagina, tamanho), PacienteResponse::de);
+        return PaginaResponse.of(listar.executar(termo, ativo, pagina, tamanho), PacienteResponse::de);
     }
 
     @Operation(summary = "Cadastro do paciente autenticado",

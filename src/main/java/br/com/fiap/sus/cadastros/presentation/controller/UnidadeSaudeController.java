@@ -54,7 +54,7 @@ public class UnidadeSaudeController {
             @RequestParam(required = false) Boolean ativo,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "50") int tamanho) {
-        return PaginaResponse.de(listar.executar(ativo, pagina, tamanho), UnidadeSaudeResponse::de);
+        return PaginaResponse.of(listar.executar(ativo, pagina, tamanho), UnidadeSaudeResponse::de);
     }
 
     @Operation(summary = "Inativa uma unidade de saude", description = "Exige ADMINISTRADOR.")

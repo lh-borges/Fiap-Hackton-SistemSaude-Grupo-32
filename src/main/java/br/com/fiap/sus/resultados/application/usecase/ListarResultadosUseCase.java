@@ -15,13 +15,15 @@ import org.springframework.stereotype.Component;
 public class ListarResultadosUseCase {
 
     private final ResultadoExameRepository resultadoExameRepository;
+    private final br.com.fiap.sus.resultados.api.IndicadorParecerQuery pareceres;
     private final CadastroQuery cadastroQuery;
     private final UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
     public ListarResultadosUseCase(ResultadoExameRepository resultadoExameRepository,
                                    CadastroQuery cadastroQuery,
-                                   UsuarioAutenticadoProvider usuarioAutenticadoProvider) {
+                                   UsuarioAutenticadoProvider usuarioAutenticadoProvider, br.com.fiap.sus.resultados.api.IndicadorParecerQuery pareceres) {
         this.resultadoExameRepository = resultadoExameRepository;
+        this.pareceres = pareceres;
         this.cadastroQuery = cadastroQuery;
         this.usuarioAutenticadoProvider = usuarioAutenticadoProvider;
     }
@@ -37,6 +39,10 @@ public class ListarResultadosUseCase {
             filtroEfetivo = new ResultadoExameFiltro(pacienteId, filtro.periodoInicio(), filtro.periodoFim());
         }
 
-        return resultadoExameRepository.listar(filtroEfetivo, pagina, tamanho).mapear(ResultadoExameOutput::de);
+        var resultados = resultadoExameRepository.listar(filtroEfetivo, pagina, tamanho);
+        var ids = resultados.conteudo().stream().map(br.com.fiap.sus.resultados.domain.model.ResultadoExame::getId)
+                .collect(java.util.stream.Collectors.toSet());
+        var comParecer = ids.isEmpty() ? java.util.Set.<java.util.UUID>of() : pareceres.resultadosComParecer(ids);
+        return resultados.mapear(resultado -> ResultadoExameOutput.de(resultado, comParecer.contains(resultado.getId())));
     }
 }

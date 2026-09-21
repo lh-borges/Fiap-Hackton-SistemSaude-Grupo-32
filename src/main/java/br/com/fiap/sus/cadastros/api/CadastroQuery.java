@@ -23,6 +23,8 @@ public interface CadastroQuery {
     /** Devolve IMAGEM ou LABORATORIAL; usado pelo modulo de resultados (feature 005, RN-02). */
     Optional<String> categoriaDoTipoExame(UUID tipoExameId);
 
+    Optional<String> nomeDoTipoExame(UUID tipoExameId);
+
     /** Resolve o vinculo usuario -> paciente, base da verificacao de posse do dado. */
     Optional<UUID> pacienteIdDoUsuario(UUID usuarioId);
 

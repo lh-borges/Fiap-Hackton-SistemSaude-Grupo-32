@@ -57,7 +57,7 @@ class CadastrarPacienteUseCaseTest {
         when(pacientes.existePorCartaoSus(anyString())).thenReturn(false);
         when(pacientes.salvar(any())).thenAnswer(chamada -> chamada.getArgument(0));
         when(iam.resumoDoUsuario(USUARIO)).thenReturn(Optional.of(
-                new UsuarioResumo(USUARIO, "Maria Souza", "maria@sus.gov.br", true, Set.of("PACIENTE"))));
+                new UsuarioResumo(USUARIO, "Maria Souza", "111.444.777-35", "maria@sus.gov.br", true, Set.of("PACIENTE"))));
 
         PacienteOutput saida = cadastrar.executar(entrada("123456789012345"));
 

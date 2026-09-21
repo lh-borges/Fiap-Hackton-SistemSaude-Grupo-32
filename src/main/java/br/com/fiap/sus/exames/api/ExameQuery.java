@@ -1,5 +1,6 @@
 package br.com.fiap.sus.exames.api;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,6 +13,10 @@ import java.util.UUID;
 public interface ExameQuery {
 
     boolean exameRealizadoExiste(UUID exameId);
+
+    Optional<Instant> dataRealizacaoDoExame(UUID exameId);
+
+    Optional<UUID> pacienteIdDoExame(UUID exameId);
 
     /** Resolve, a partir do exame, o tipo de exame da solicitacao de origem. */
     Optional<UUID> tipoExameIdDoExame(UUID exameId);

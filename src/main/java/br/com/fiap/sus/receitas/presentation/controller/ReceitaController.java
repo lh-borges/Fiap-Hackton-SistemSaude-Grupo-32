@@ -89,6 +89,6 @@ public class ReceitaController {
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "50") int tamanho) {
         ReceitaFiltro filtro = new ReceitaFiltro(pacienteId, medicoId, situacao);
-        return PaginaResponse.de(listar.executar(filtro, pagina, tamanho), ReceitaResponse::de);
+        return PaginaResponse.of(listar.executar(filtro, pagina, tamanho), ReceitaResponse::de);
     }
 }

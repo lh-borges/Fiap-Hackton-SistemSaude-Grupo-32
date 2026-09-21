@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.resultados.application.dto.ResultadoExameOutput;
+import br.com.fiap.sus.resultados.api.IndicadorParecerQuery;
 import br.com.fiap.sus.resultados.domain.model.ResultadoExame;
 import br.com.fiap.sus.resultados.domain.repository.ResultadoExameRepository;
 import br.com.fiap.sus.shared.domain.exception.RecursoNaoEncontradoException;
@@ -34,6 +35,9 @@ class ConsultarResultadoUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+    private IndicadorParecerQuery indicadorParecerQuery;
+
     private ConsultarResultadoUseCase useCase;
 
     private final UUID resultadoId = UUID.randomUUID();
@@ -42,7 +46,7 @@ class ConsultarResultadoUseCaseTest {
     @BeforeEach
     void configurar() {
         useCase = new ConsultarResultadoUseCase(resultadoExameRepository, cadastroQuery,
-                usuarioAutenticadoProvider);
+                usuarioAutenticadoProvider, indicadorParecerQuery);
     }
 
     private ResultadoExame resultadoDoPaciente() {
@@ -57,6 +61,7 @@ class ConsultarResultadoUseCaseTest {
         when(resultadoExameRepository.buscarPorId(resultadoId)).thenReturn(Optional.of(resultadoDoPaciente()));
         UsuarioAutenticado usuario = new UsuarioAutenticado(UUID.randomUUID(), "Dr. Carlos", Set.of("MEDICO"));
         when(usuarioAutenticadoProvider.obrigatorio()).thenReturn(usuario);
+        when(indicadorParecerQuery.resultadosComParecer(Set.of(resultadoId))).thenReturn(Set.of());
 
         ResultadoExameOutput resultado = useCase.executar(resultadoId);
 
@@ -71,6 +76,7 @@ class ConsultarResultadoUseCaseTest {
         UsuarioAutenticado usuario = new UsuarioAutenticado(usuarioId, "Joao", Set.of("PACIENTE"));
         when(usuarioAutenticadoProvider.obrigatorio()).thenReturn(usuario);
         when(cadastroQuery.pacienteIdDoUsuario(usuarioId)).thenReturn(Optional.of(pacienteId));
+        when(indicadorParecerQuery.resultadosComParecer(Set.of(resultadoId))).thenReturn(Set.of());
 
         ResultadoExameOutput resultado = useCase.executar(resultadoId);
 

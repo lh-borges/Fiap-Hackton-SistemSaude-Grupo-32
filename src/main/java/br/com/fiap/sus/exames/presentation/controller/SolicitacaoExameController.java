@@ -78,6 +78,6 @@ public class SolicitacaoExameController {
             @RequestParam(defaultValue = "50") int tamanho) {
         SolicitacaoExameFiltro filtro = new SolicitacaoExameFiltro(pacienteId, medicoId, tipoExameId,
                 situacao, periodoInicio, periodoFim);
-        return PaginaResponse.de(listar.executar(filtro, pagina, tamanho), SolicitacaoExameResponse::de);
+        return PaginaResponse.of(listar.executar(filtro, pagina, tamanho), SolicitacaoExameResponse::de);
     }
 }
