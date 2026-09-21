@@ -7,6 +7,8 @@ import br.com.fiap.sus.consultas.api.ConsultaQuery;
 import br.com.fiap.sus.documentos.application.dto.DocumentoMedicoOutput;
 import br.com.fiap.sus.documentos.domain.enums.TipoDocumento;
 import br.com.fiap.sus.exames.api.ExameQuery;
+import br.com.fiap.sus.resultados.api.ResultadoQuery;
+import br.com.fiap.sus.resultados.api.ResultadoResumo;
 import br.com.fiap.sus.shared.domain.exception.RegraDeNegocioException;
 import java.io.InputStream;
 import java.time.ZoneId;
@@ -29,16 +31,20 @@ public class DocumentoPdfService {
     private final CadastroQuery cadastros;
     private final ConsultaQuery consultas;
     private final ExameQuery exames;
+    private final ResultadoQuery resultados;
 
-    public DocumentoPdfService(CadastroQuery cadastros, ConsultaQuery consultas, ExameQuery exames) {
+    public DocumentoPdfService(CadastroQuery cadastros, ConsultaQuery consultas, ExameQuery exames,
+                               ResultadoQuery resultados) {
         this.cadastros = cadastros;
         this.consultas = consultas;
         this.exames = exames;
+        this.resultados = resultados;
     }
 
     public byte[] gerar(DocumentoMedicoOutput documento) {
         try (InputStream template = new ClassPathResource("reports/documento-medico.jrxml").getInputStream()) {
             JasperReport report = JasperCompileManager.compileReport(template);
+            ResultadoResumo resultado = resultado(documento);
             Map<String, Object> parametros = new HashMap<>();
             parametros.put("titulo", documento.tipo().tituloPdf());
             parametros.put("tipo", documento.tipo().name());
@@ -54,9 +60,17 @@ public class DocumentoPdfService {
             parametros.put("consultaId", documento.consultaId() == null ? "-" : documento.consultaId().toString());
             parametros.put("dataConsulta", dataConsulta(documento));
             parametros.put("exameId", documento.exameId() == null ? "-" : documento.exameId().toString());
-            parametros.put("tipoExameNome", nomeTipoExame(documento));
+            parametros.put("tipoExameNome", nomeTipoExame(documento, resultado));
             parametros.put("dataRealizacaoExame", dataRealizacaoExame(documento));
             parametros.put("exibirDadosExame", documento.tipo() == TipoDocumento.LAUDO && documento.exameId() != null);
+            parametros.put("tipoResultado", valorOuTraco(resultado == null ? null : resultado.tipoResultado()));
+            parametros.put("dataResultado", resultado == null || resultado.dataResultado() == null
+                    ? "-"
+                    : DATA.format(resultado.dataResultado()));
+            parametros.put("descricaoResultado", valorOuTraco(resultado == null ? null : resultado.descricao()));
+            parametros.put("laudoResultado", valorOuTraco(resultado == null ? null : resultado.laudo()));
+            parametros.put("arquivoResultadoUrl", valorOuTraco(resultado == null ? null : resultado.arquivoUrl()));
+            parametros.put("observacaoResultado", valorOuTraco(resultado == null ? null : resultado.observacao()));
             parametros.put("conteudo", documento.conteudo());
             parametros.put("motivoCancelamento",
                     documento.motivoCancelamento() == null ? "" : documento.motivoCancelamento());
@@ -120,13 +134,27 @@ public class DocumentoPdfService {
                 .orElse("-");
     }
 
-    private String nomeTipoExame(DocumentoMedicoOutput documento) {
+    private String nomeTipoExame(DocumentoMedicoOutput documento, ResultadoResumo resultado) {
         if (documento.exameId() == null) {
             return "-";
+        }
+        if (resultado != null && resultado.descricao() != null && !resultado.descricao().isBlank()) {
+            return resultado.descricao();
         }
         return exames.tipoExameIdDoExame(documento.exameId())
                 .flatMap(cadastros::nomeDoTipoExame)
                 .filter(nome -> !nome.isBlank())
                 .orElse("-");
+    }
+
+    private ResultadoResumo resultado(DocumentoMedicoOutput documento) {
+        if (documento.tipo() != TipoDocumento.LAUDO || documento.exameId() == null) {
+            return null;
+        }
+        return resultados.resultadoDoExame(documento.exameId()).orElse(null);
+    }
+
+    private String valorOuTraco(String valor) {
+        return valor == null || valor.isBlank() ? "-" : valor;
     }
 }

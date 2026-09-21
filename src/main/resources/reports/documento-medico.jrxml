@@ -21,6 +21,12 @@
     <parameter name="tipoExameNome" class="java.lang.String"/>
     <parameter name="dataRealizacaoExame" class="java.lang.String"/>
     <parameter name="exibirDadosExame" class="java.lang.Boolean"/>
+    <parameter name="tipoResultado" class="java.lang.String"/>
+    <parameter name="dataResultado" class="java.lang.String"/>
+    <parameter name="descricaoResultado" class="java.lang.String"/>
+    <parameter name="laudoResultado" class="java.lang.String"/>
+    <parameter name="arquivoResultadoUrl" class="java.lang.String"/>
+    <parameter name="observacaoResultado" class="java.lang.String"/>
     <parameter name="conteudo" class="java.lang.String"/>
     <parameter name="motivoCancelamento" class="java.lang.String"/>
 
@@ -119,8 +125,20 @@
                 </reportElement>
                 <textFieldExpression><![CDATA["Data de realizacao do exame: " + $P{dataRealizacaoExame}]]></textFieldExpression>
             </textField>
+            <textField>
+                <reportElement x="265" y="78" width="250" height="16" uuid="307b89f8-4eec-4a0f-a47e-8ebf99f7c0f3">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+                <textFieldExpression><![CDATA["Tipo do resultado: " + $P{tipoResultado}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="265" y="96" width="250" height="16" uuid="ad72f6c8-20dd-44f5-bd46-32df86a8a445">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+                <textFieldExpression><![CDATA["Data do resultado: " + $P{dataResultado}]]></textFieldExpression>
+            </textField>
             <textField textAdjust="StretchHeight">
-                <reportElement x="0" y="82" width="515" height="222" positionType="Float" uuid="2c13efc8-7b50-45f6-82f0-b48c2297ecf5"/>
+                <reportElement x="0" y="118" width="515" height="122" positionType="Float" uuid="2c13efc8-7b50-45f6-82f0-b48c2297ecf5"/>
                 <textElement>
                     <font size="11"/>
                     <paragraph lineSpacing="1_1_2"/>
@@ -128,7 +146,17 @@
                 <textFieldExpression><![CDATA[$P{conteudo}]]></textFieldExpression>
             </textField>
             <textField textAdjust="StretchHeight" isBlankWhenNull="true">
-                <reportElement x="0" y="324" width="515" height="70" positionType="Float" uuid="86841095-fd13-4761-89c2-67b3085b0387">
+                <reportElement x="0" y="252" width="515" height="72" positionType="Float" uuid="316fd8d0-e810-4228-a3fd-c92c04cb188d">
+                    <printWhenExpression><![CDATA[$P{exibirDadosExame}]]></printWhenExpression>
+                </reportElement>
+                <textElement>
+                    <font size="10"/>
+                    <paragraph lineSpacing="1_1_2"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Resultado registrado:\nDescricao: " + $P{descricaoResultado} + "\nLaudo do resultado: " + $P{laudoResultado} + "\nObservacao: " + $P{observacaoResultado} + "\nArquivo do resultado: " + $P{arquivoResultadoUrl}]]></textFieldExpression>
+            </textField>
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+                <reportElement x="0" y="344" width="515" height="70" positionType="Float" uuid="86841095-fd13-4761-89c2-67b3085b0387">
                     <printWhenExpression><![CDATA[$P{motivoCancelamento} != null && !$P{motivoCancelamento}.isBlank()]]></printWhenExpression>
                 </reportElement>
                 <textFieldExpression><![CDATA["Motivo do cancelamento:\n" + $P{motivoCancelamento}]]></textFieldExpression>

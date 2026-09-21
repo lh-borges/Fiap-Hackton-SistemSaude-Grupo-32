@@ -5,6 +5,7 @@ import br.com.fiap.sus.cadastros.api.PacienteResumo;
 import br.com.fiap.sus.documentos.application.dto.DocumentoMedicoOutput;
 import br.com.fiap.sus.documentos.domain.enums.SituacaoDocumento;
 import br.com.fiap.sus.documentos.domain.enums.TipoDocumento;
+import br.com.fiap.sus.resultados.api.ResultadoResumo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -47,12 +48,18 @@ public record DocumentoMedicoResponse(
     public static DocumentoMedicoResponse de(DocumentoMedicoOutput output, PacienteResumo paciente,
                                              MedicoResumo medico, Instant dataConsulta, Instant dataRealizacaoExame,
                                              String tipoExameNome) {
+        return de(output, paciente, medico, dataConsulta, dataRealizacaoExame, tipoExameNome, null);
+    }
+
+    public static DocumentoMedicoResponse de(DocumentoMedicoOutput output, PacienteResumo paciente,
+                                             MedicoResumo medico, Instant dataConsulta, Instant dataRealizacaoExame,
+                                             String tipoExameNome, ResultadoResumo resultado) {
         Objects.requireNonNull(output, "output nao pode ser nulo");
 
         var datas = DatasDocumento.de(output, dataConsulta, dataRealizacaoExame);
         var pacienteResponse = PacienteResponse.de(paciente);
         var medicoResponse = MedicoResponse.de(medico);
-        var exameResponse = ExameResponse.de(output, datas.dataRealizacaoExame(), tipoExameNome);
+        var exameResponse = ExameResponse.de(output, datas.dataRealizacaoExame(), tipoExameNome, resultado);
 
         return new DocumentoMedicoResponse(
                 output.id(),
@@ -79,7 +86,15 @@ public record DocumentoMedicoResponse(
                                                                       ExameResponse exame) {
         if (ehLaudoComExame(output)) {
             return DocumentoDadosEspecificosResponse.laudoExame(
-                    datas.dataConsulta(), exame.tipoExameNome(), exame.dataRealizacaoExame());
+                    datas.dataConsulta(),
+                    exame.tipoExameNome(),
+                    exame.dataRealizacaoExame(),
+                    exame.tipoResultado(),
+                    exame.dataResultado(),
+                    exame.descricaoResultado(),
+                    exame.laudoResultado(),
+                    exame.arquivoResultadoUrl(),
+                    exame.observacaoResultado());
         }
         return DocumentoDadosEspecificosResponse.atendimento(
                 output.tipo().name(), rotuloConteudo(output.tipo()), datas.dataConsulta());
@@ -126,11 +141,20 @@ public record DocumentoMedicoResponse(
         }
     }
 
-    private record ExameResponse(String tipoExameNome, String dataRealizacaoExame) {
-        static ExameResponse de(DocumentoMedicoOutput output, String dataRealizacaoExame, String tipoExameNome) {
+    private record ExameResponse(String tipoExameNome, String dataRealizacaoExame, String tipoResultado,
+                                 String dataResultado, String descricaoResultado, String laudoResultado,
+                                 String arquivoResultadoUrl, String observacaoResultado) {
+        static ExameResponse de(DocumentoMedicoOutput output, String dataRealizacaoExame, String tipoExameNome,
+                                ResultadoResumo resultado) {
             return ehLaudoComExame(output)
-                    ? new ExameResponse(tipoExameNome, dataRealizacaoExame)
-                    : new ExameResponse(null, null);
+                    ? new ExameResponse(tipoExameNome, dataRealizacaoExame,
+                    resultado == null ? null : resultado.tipoResultado(),
+                    resultado == null ? null : formatar(resultado.dataResultado()),
+                    resultado == null ? null : resultado.descricao(),
+                    resultado == null ? null : resultado.laudo(),
+                    resultado == null ? null : resultado.arquivoUrl(),
+                    resultado == null ? null : resultado.observacao())
+                    : new ExameResponse(null, null, null, null, null, null, null, null);
         }
     }
 
@@ -148,9 +172,13 @@ public record DocumentoMedicoResponse(
         }
 
         static DocumentoDadosEspecificosResponse laudoExame(String dataConsulta, String tipoExameNome,
-                                                            String dataRealizacaoExame) {
+                                                            String dataRealizacaoExame, String tipoResultado,
+                                                            String dataResultado, String descricaoResultado,
+                                                            String laudoResultado, String arquivoResultadoUrl,
+                                                            String observacaoResultado) {
             return new DocumentoDadosLaudoExameResponse("LAUDO_EXAME", "Laudo e conclusao clinica",
-                    dataConsulta, tipoExameNome, dataRealizacaoExame);
+                    dataConsulta, tipoExameNome, dataRealizacaoExame, tipoResultado, dataResultado,
+                    descricaoResultado, laudoResultado, arquivoResultadoUrl, observacaoResultado);
         }
     }
 
@@ -168,7 +196,13 @@ public record DocumentoMedicoResponse(
             String rotuloConteudo,
             String dataConsulta,
             String tipoExameNome,
-            String dataRealizacaoExame
+            String dataRealizacaoExame,
+            String tipoResultado,
+            String dataResultado,
+            String descricaoResultado,
+            String laudoResultado,
+            String arquivoResultadoUrl,
+            String observacaoResultado
     ) implements DocumentoDadosEspecificosResponse {
     }
 }

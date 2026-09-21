@@ -7,6 +7,7 @@ import br.com.fiap.sus.documentos.domain.enums.SituacaoDocumento;
 import br.com.fiap.sus.documentos.domain.enums.TipoDocumento;
 import br.com.fiap.sus.documentos.presentation.response.DocumentoMedicoResponse.DocumentoDadosAtendimentoResponse;
 import br.com.fiap.sus.documentos.presentation.response.DocumentoMedicoResponse.DocumentoDadosLaudoExameResponse;
+import br.com.fiap.sus.resultados.api.ResultadoResumo;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,13 @@ class DocumentoMedicoResponseTest {
         DocumentoMedicoResponse response = DocumentoMedicoResponse.de(output, paciente, medico,
                 Instant.parse("2026-09-20T12:00:00Z"),
                 Instant.parse("2026-09-20T13:30:00Z"),
-                "Raio-X de torax");
+                "Raio-X de torax",
+                new ResultadoResumo(UUID.randomUUID(), exameId, pacienteId, "IMAGEM",
+                        Instant.parse("2026-09-21T03:00:14Z"),
+                        "Resultado registrado para teste do fluxo de parecer.",
+                        "https://exemplo.local/raio-x-torax.pdf",
+                        "Raio-X de torax",
+                        "Sem alteracoes agudas evidentes."));
 
         assertThat(response.id()).isEqualTo(id);
         assertThat(response.dataConsulta()).isEqualTo("20/09/2026 09:00");
@@ -55,6 +62,12 @@ class DocumentoMedicoResponseTest {
         assertThat(dadosLaudo.dataConsulta()).isEqualTo("20/09/2026 09:00");
         assertThat(dadosLaudo.tipoExameNome()).isEqualTo("Raio-X de torax");
         assertThat(dadosLaudo.dataRealizacaoExame()).isEqualTo("20/09/2026 10:30");
+        assertThat(dadosLaudo.tipoResultado()).isEqualTo("IMAGEM");
+        assertThat(dadosLaudo.dataResultado()).isEqualTo("21/09/2026 00:00");
+        assertThat(dadosLaudo.descricaoResultado()).isEqualTo("Raio-X de torax");
+        assertThat(dadosLaudo.laudoResultado()).isEqualTo("Sem alteracoes agudas evidentes.");
+        assertThat(dadosLaudo.arquivoResultadoUrl()).isEqualTo("https://exemplo.local/raio-x-torax.pdf");
+        assertThat(dadosLaudo.observacaoResultado()).isEqualTo("Resultado registrado para teste do fluxo de parecer.");
         assertThat(response.conteudo()).isEqualTo("Conteudo clinico");
         assertThat(response.arquivoUrl()).isEqualTo("https://arquivo.local/documento.pdf");
         assertThat(response.dataEmissao()).isEqualTo("20/09/2026 06:00");

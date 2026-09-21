@@ -16,6 +16,8 @@ import br.com.fiap.sus.documentos.presentation.request.CancelarDocumentoRequest;
 import br.com.fiap.sus.documentos.presentation.request.EmitirDocumentoRequest;
 import br.com.fiap.sus.documentos.presentation.response.DocumentoMedicoResponse;
 import br.com.fiap.sus.exames.api.ExameQuery;
+import br.com.fiap.sus.resultados.api.ResultadoQuery;
+import br.com.fiap.sus.resultados.api.ResultadoResumo;
 import br.com.fiap.sus.shared.domain.exception.RegraDeNegocioException;
 import br.com.fiap.sus.shared.presentation.dto.PaginaResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +52,7 @@ public class DocumentoMedicoController {
     private final CadastroQuery cadastros;
     private final ConsultaQuery consultas;
     private final ExameQuery exames;
+    private final ResultadoQuery resultados;
 
     public DocumentoMedicoController(
             EmitirDocumentoUseCase emitir,
@@ -59,7 +62,8 @@ public class DocumentoMedicoController {
             DocumentoPdfService pdfs,
             CadastroQuery cadastros,
             ConsultaQuery consultas,
-            ExameQuery exames
+            ExameQuery exames,
+            ResultadoQuery resultados
     ) {
         this.emitir = emitir;
         this.consultar = consultar;
@@ -69,6 +73,7 @@ public class DocumentoMedicoController {
         this.cadastros = cadastros;
         this.consultas = consultas;
         this.exames = exames;
+        this.resultados = resultados;
     }
 
     @Operation(summary = "Emite documento medico", description = "Exige MEDICO.")
@@ -142,9 +147,20 @@ public class DocumentoMedicoController {
         UUID tipoExameId = !laudoComExame
                 ? null
                 : exames.tipoExameIdDoExame(output.exameId()).orElse(null);
-        String tipoExameNome = tipoExameId == null
+        ResultadoResumo resultado = !laudoComExame
+                ? null
+                : resultados.resultadoDoExame(output.exameId()).orElse(null);
+        String tipoExameNome = tipoExameNome(tipoExameId, resultado);
+        return DocumentoMedicoResponse.de(output, paciente, medico, dataConsulta, dataRealizacaoExame, tipoExameNome,
+                resultado);
+    }
+
+    private String tipoExameNome(UUID tipoExameId, ResultadoResumo resultado) {
+        if (resultado != null && resultado.descricao() != null && !resultado.descricao().isBlank()) {
+            return resultado.descricao();
+        }
+        return tipoExameId == null
                 ? null
                 : cadastros.nomeDoTipoExame(tipoExameId).orElse(null);
-        return DocumentoMedicoResponse.de(output, paciente, medico, dataConsulta, dataRealizacaoExame, tipoExameNome);
     }
 }

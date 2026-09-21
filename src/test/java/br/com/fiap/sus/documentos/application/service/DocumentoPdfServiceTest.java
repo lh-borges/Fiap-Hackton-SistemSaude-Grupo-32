@@ -12,6 +12,8 @@ import br.com.fiap.sus.documentos.application.dto.DocumentoMedicoOutput;
 import br.com.fiap.sus.documentos.domain.enums.SituacaoDocumento;
 import br.com.fiap.sus.documentos.domain.enums.TipoDocumento;
 import br.com.fiap.sus.exames.api.ExameQuery;
+import br.com.fiap.sus.resultados.api.ResultadoQuery;
+import br.com.fiap.sus.resultados.api.ResultadoResumo;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import java.time.Instant;
@@ -26,7 +28,8 @@ class DocumentoPdfServiceTest {
     private final CadastroQuery cadastros = mock(CadastroQuery.class);
     private final ConsultaQuery consultas = mock(ConsultaQuery.class);
     private final ExameQuery exames = mock(ExameQuery.class);
-    private final DocumentoPdfService service = new DocumentoPdfService(cadastros, consultas, exames);
+    private final ResultadoQuery resultados = mock(ResultadoQuery.class);
+    private final DocumentoPdfService service = new DocumentoPdfService(cadastros, consultas, exames, resultados);
 
     @Test
     void geraPdfComNomeDoPacienteEDoMedico() throws Exception {
@@ -123,6 +126,17 @@ class DocumentoPdfServiceTest {
                 .thenReturn(Optional.of(Instant.parse("2026-09-20T12:00:00Z")));
         when(exames.tipoExameIdDoExame(exameId)).thenReturn(Optional.of(tipoExameId));
         when(cadastros.nomeDoTipoExame(tipoExameId)).thenReturn(Optional.of("Raio-X de torax"));
+        when(resultados.resultadoDoExame(exameId)).thenReturn(Optional.of(new ResultadoResumo(
+                UUID.randomUUID(),
+                exameId,
+                pacienteId,
+                "IMAGEM",
+                Instant.parse("2026-09-21T03:00:14Z"),
+                "Resultado registrado para teste do fluxo de parecer.",
+                "https://exemplo.local/raio-x-torax.pdf",
+                "Raio-X de torax",
+                "Sem alteracoes agudas evidentes."
+        )));
 
         var documento = new DocumentoMedicoOutput(
                 UUID.randomUUID(),
@@ -142,7 +156,13 @@ class DocumentoPdfServiceTest {
 
         assertThat(texto).contains("Laudo M", "Informa", "Laudo e conclus",
                 "Exame: " + exameId, "Tipo de exame: Raio-X de torax",
-                "Data de realizacao do exame: 20/09/2026 09:00");
+                "Data de realizacao do exame: 20/09/2026 09:00",
+                "Tipo do resultado: IMAGEM",
+                "Data do resultado: 21/09/2026 00:00",
+                "Descricao: Raio-X de torax",
+                "Laudo do resultado: Sem alteracoes agudas evidentes.",
+                "Observacao: Resultado registrado para teste do fluxo de parecer.",
+                "Arquivo do resultado: https://exemplo.local/raio-x-torax.pdf");
     }
 
     private String textoDoPdf(byte[] pdf) throws Exception {

@@ -16,6 +16,8 @@ import br.com.fiap.sus.documentos.domain.model.DocumentoMedico;
 import br.com.fiap.sus.documentos.domain.repository.DocumentoMedicoFiltro;
 import br.com.fiap.sus.documentos.domain.repository.DocumentoMedicoRepository;
 import br.com.fiap.sus.exames.api.ExameQuery;
+import br.com.fiap.sus.resultados.api.ResultadoQuery;
+import br.com.fiap.sus.resultados.api.ResultadoResumo;
 import br.com.fiap.sus.shared.domain.PaginaResultado;
 import br.com.fiap.sus.shared.infrastructure.security.UsuarioAutenticado;
 import br.com.fiap.sus.shared.infrastructure.security.UsuarioAutenticadoProvider;
@@ -80,6 +82,7 @@ class DocumentoMedicoControllerTest {
     @Autowired CadastroQuery cadastros;
     @Autowired ConsultaQuery consultas;
     @Autowired ExameQuery exames;
+    @Autowired ResultadoQuery resultados;
     @Autowired DocumentoPdfService pdfs;
     @Autowired ApplicationEventPublisher eventos;
 
@@ -106,13 +109,14 @@ class DocumentoMedicoControllerTest {
         @Bean CadastroQuery cadastros() { return mock(CadastroQuery.class); }
         @Bean ConsultaQuery consultas() { return mock(ConsultaQuery.class); }
         @Bean ExameQuery exames() { return mock(ExameQuery.class); }
+        @Bean ResultadoQuery resultados() { return mock(ResultadoQuery.class); }
         @Bean DocumentoPdfService pdfs() { return mock(DocumentoPdfService.class); }
         @Bean ApplicationEventPublisher eventos() { return mock(ApplicationEventPublisher.class); }
     }
 
     @BeforeEach
     void configurar() {
-        reset(repository, cadastros, consultas, exames, pdfs, eventos);
+        reset(repository, cadastros, consultas, exames, resultados, pdfs, eventos);
         when(cadastros.resumoDoPaciente(paciente)).thenReturn(Optional.of(
                 new PacienteResumo(paciente, usuarioPaciente, "Maria Souza", "111.444.777-35",
                         "maria.souza@sus.gov.br", true)));
@@ -207,6 +211,17 @@ class DocumentoMedicoControllerTest {
         when(exames.tipoExameIdDoExame(exame)).thenReturn(Optional.of(UUID.fromString("00000000-0000-0000-0000-0000000000c3")));
         when(cadastros.nomeDoTipoExame(UUID.fromString("00000000-0000-0000-0000-0000000000c3")))
                 .thenReturn(Optional.of("Raio-X de torax"));
+        when(resultados.resultadoDoExame(exame)).thenReturn(Optional.of(new ResultadoResumo(
+                UUID.randomUUID(),
+                exame,
+                paciente,
+                "IMAGEM",
+                Instant.parse("2026-09-21T03:00:14Z"),
+                "Resultado registrado para teste do fluxo de parecer.",
+                "https://exemplo.local/raio-x-torax.pdf",
+                "Raio-X de torax",
+                "Sem alteracoes agudas evidentes."
+        )));
         when(repository.salvar(any(DocumentoMedico.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         String body = json.writeValueAsString(Map.of(
@@ -230,7 +245,15 @@ class DocumentoMedicoControllerTest {
                 .andExpect(jsonPath("$.dadosEspecificos.tipoExameId").doesNotExist())
                 .andExpect(jsonPath("$.dadosEspecificos.tipoExameNome").value("Raio-X de torax"))
                 .andExpect(jsonPath("$.dadosEspecificos.dataConsulta").value("20/09/2026 10:30"))
-                .andExpect(jsonPath("$.dadosEspecificos.dataRealizacaoExame").value("20/09/2026 09:00"));
+                .andExpect(jsonPath("$.dadosEspecificos.dataRealizacaoExame").value("20/09/2026 09:00"))
+                .andExpect(jsonPath("$.dadosEspecificos.tipoResultado").value("IMAGEM"))
+                .andExpect(jsonPath("$.dadosEspecificos.dataResultado").value("21/09/2026 00:00"))
+                .andExpect(jsonPath("$.dadosEspecificos.descricaoResultado").value("Raio-X de torax"))
+                .andExpect(jsonPath("$.dadosEspecificos.laudoResultado").value("Sem alteracoes agudas evidentes."))
+                .andExpect(jsonPath("$.dadosEspecificos.arquivoResultadoUrl")
+                        .value("https://exemplo.local/raio-x-torax.pdf"))
+                .andExpect(jsonPath("$.dadosEspecificos.observacaoResultado")
+                        .value("Resultado registrado para teste do fluxo de parecer."));
 
         var salvo = ArgumentCaptor.forClass(DocumentoMedico.class);
         verify(repository).salvar(salvo.capture());

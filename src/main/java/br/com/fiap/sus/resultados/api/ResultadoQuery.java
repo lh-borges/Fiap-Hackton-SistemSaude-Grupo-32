@@ -7,4 +7,6 @@ import java.util.UUID;
 public interface ResultadoQuery {
 
     Optional<UUID> pacienteIdDoResultado(UUID resultadoId);
+
+    Optional<ResultadoResumo> resultadoDoExame(UUID exameId);
 }
