@@ -135,16 +135,16 @@ public class DocumentoMedicoController {
         var dataConsulta = output.consultaId() == null
                 ? null
                 : consultas.dataHoraDaConsulta(output.consultaId()).orElse(null);
-        var dataRealizacaoExame = output.exameId() == null
+        boolean laudoComExame = output.tipo() == TipoDocumento.LAUDO && output.exameId() != null;
+        var dataRealizacaoExame = !laudoComExame
                 ? null
                 : exames.dataRealizacaoDoExame(output.exameId()).orElse(null);
-        UUID tipoExameId = output.exameId() == null
+        UUID tipoExameId = !laudoComExame
                 ? null
                 : exames.tipoExameIdDoExame(output.exameId()).orElse(null);
         String tipoExameNome = tipoExameId == null
                 ? null
                 : cadastros.nomeDoTipoExame(tipoExameId).orElse(null);
-        return DocumentoMedicoResponse.de(output, paciente, medico, dataConsulta, dataRealizacaoExame,
-                tipoExameId, tipoExameNome);
+        return DocumentoMedicoResponse.de(output, paciente, medico, dataConsulta, dataRealizacaoExame, tipoExameNome);
     }
 }

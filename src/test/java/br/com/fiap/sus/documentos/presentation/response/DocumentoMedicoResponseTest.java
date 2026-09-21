@@ -5,6 +5,8 @@ import br.com.fiap.sus.cadastros.api.PacienteResumo;
 import br.com.fiap.sus.documentos.application.dto.DocumentoMedicoOutput;
 import br.com.fiap.sus.documentos.domain.enums.SituacaoDocumento;
 import br.com.fiap.sus.documentos.domain.enums.TipoDocumento;
+import br.com.fiap.sus.documentos.presentation.response.DocumentoMedicoResponse.DocumentoDadosAtendimentoResponse;
+import br.com.fiap.sus.documentos.presentation.response.DocumentoMedicoResponse.DocumentoDadosLaudoExameResponse;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,6 @@ class DocumentoMedicoResponseTest {
         UUID id = UUID.randomUUID();
         UUID consultaId = UUID.randomUUID();
         UUID exameId = UUID.randomUUID();
-        UUID tipoExameId = UUID.randomUUID();
         UUID pacienteId = UUID.randomUUID();
         UUID medicoId = UUID.randomUUID();
         UUID pacienteUsuarioId = UUID.randomUUID();
@@ -36,7 +37,6 @@ class DocumentoMedicoResponseTest {
         DocumentoMedicoResponse response = DocumentoMedicoResponse.de(output, paciente, medico,
                 Instant.parse("2026-09-20T12:00:00Z"),
                 Instant.parse("2026-09-20T13:30:00Z"),
-                tipoExameId,
                 "Raio-X de torax");
 
         assertThat(response.id()).isEqualTo(id);
@@ -50,13 +50,41 @@ class DocumentoMedicoResponseTest {
         assertThat(response.medicoCrm()).isEqualTo("123456/SP");
         assertThat(response.tipoDocumento()).isEqualTo(TipoDocumento.LAUDO);
         assertThat(response.dadosEspecificos().tipo()).isEqualTo("LAUDO_EXAME");
-        assertThat(response.dadosEspecificos().dataConsulta()).isEqualTo("20/09/2026 09:00");
-        assertThat(response.dadosEspecificos().tipoExameNome()).isEqualTo("Raio-X de torax");
-        assertThat(response.dadosEspecificos().dataRealizacaoExame()).isEqualTo("20/09/2026 10:30");
+        assertThat(response.dadosEspecificos()).isInstanceOf(DocumentoDadosLaudoExameResponse.class);
+        var dadosLaudo = (DocumentoDadosLaudoExameResponse) response.dadosEspecificos();
+        assertThat(dadosLaudo.dataConsulta()).isEqualTo("20/09/2026 09:00");
+        assertThat(dadosLaudo.tipoExameNome()).isEqualTo("Raio-X de torax");
+        assertThat(dadosLaudo.dataRealizacaoExame()).isEqualTo("20/09/2026 10:30");
         assertThat(response.conteudo()).isEqualTo("Conteudo clinico");
         assertThat(response.arquivoUrl()).isEqualTo("https://arquivo.local/documento.pdf");
         assertThat(response.dataEmissao()).isEqualTo("20/09/2026 06:00");
         assertThat(response.situacao()).isEqualTo(SituacaoDocumento.CANCELADO);
         assertThat(response.motivoCancelamento()).isEqualTo("emitido em duplicidade");
+    }
+
+    @Test
+    void atestadoNaoRetornaDadosDeExame() {
+        UUID id = UUID.randomUUID();
+        UUID consultaId = UUID.randomUUID();
+        UUID exameId = UUID.randomUUID();
+        UUID pacienteId = UUID.randomUUID();
+        UUID medicoId = UUID.randomUUID();
+        var output = new DocumentoMedicoOutput(id, TipoDocumento.ATESTADO, "Texto do atestado",
+                pacienteId, medicoId, consultaId, exameId, Instant.parse("2026-09-20T09:00:00Z"),
+                null, SituacaoDocumento.EMITIDO, null);
+
+        DocumentoMedicoResponse response = DocumentoMedicoResponse.de(output, null, null,
+                Instant.parse("2026-09-20T12:00:00Z"),
+                Instant.parse("2026-09-20T13:30:00Z"),
+                "Raio-X de torax");
+
+        assertThat(response.tipoDocumento()).isEqualTo(TipoDocumento.ATESTADO);
+        assertThat(response.tipoExameNome()).isNull();
+        assertThat(response.dataRealizacaoExame()).isNull();
+        assertThat(response.dadosEspecificos()).isInstanceOf(DocumentoDadosAtendimentoResponse.class);
+        var dadosAtestado = (DocumentoDadosAtendimentoResponse) response.dadosEspecificos();
+        assertThat(dadosAtestado.tipo()).isEqualTo("ATESTADO");
+        assertThat(dadosAtestado.rotuloConteudo()).isEqualTo("Texto do atestado");
+        assertThat(dadosAtestado.dataConsulta()).isEqualTo("20/09/2026 09:00");
     }
 }
