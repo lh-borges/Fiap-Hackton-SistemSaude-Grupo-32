@@ -64,6 +64,9 @@ Consumidor no próprio container do broker:
 docker compose exec kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic sus.consultas.agendada.v1 --from-beginning --property print.key=true
 ```
 
+> No Git Bash do Windows, prefixe os comandos `docker compose exec` com `MSYS_NO_PATHCONV=1`,
+> senão o caminho `/opt/kafka/...` é convertido para um caminho do Windows.
+
 Listar os tópicos criados pela externalização:
 
 ```bash
@@ -74,6 +77,13 @@ Registro de publicações do Modulith (mostra o que foi entregue e quando):
 
 ```bash
 docker compose exec postgres psql -U sus -d sus -c "select listener_id, event_type, publication_date, completion_date from event_publication order by publication_date desc limit 10"
+```
+
+Exemplo real de mensagem no tópico `sus.consultas.agendada.v1` (chave = `pacienteId`,
+payload só com identificadores e datas):
+
+```
+7c8a500f-… => {"eventoId":"c910933f-…","ocorridoEm":"2026-09-26T01:16:14Z","consultaId":"56f4eee8-…","pacienteId":"7c8a500f-…","medicoId":"c4971ef3-…","unidadeSaudeId":"00000000-0000-0000-0000-0000000000b1","dataHora":"2036-03-20T12:30:00Z"}
 ```
 
 ## 5. Catálogo resumido
