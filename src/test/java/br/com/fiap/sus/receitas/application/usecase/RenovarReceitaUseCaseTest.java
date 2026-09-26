@@ -1,10 +1,12 @@
 package br.com.fiap.sus.receitas.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.receitas.application.event.ReceitaRenovadaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.receitas.application.dto.ReceitaOutput;
 import br.com.fiap.sus.receitas.application.dto.RenovarReceitaDTO;
@@ -87,6 +89,7 @@ class RenovarReceitaUseCaseTest {
 
         assertThat(resultado.situacao()).isEqualTo(SituacaoReceita.ATIVA);
         assertThat(resultado.receitaOrigemId()).isEqualTo(receitaOrigemId);
+        verify(eventPublisher).publishEvent(any(ReceitaRenovadaEvent.class));
     }
 
     @Test

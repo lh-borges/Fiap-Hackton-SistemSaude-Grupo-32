@@ -1,10 +1,12 @@
 package br.com.fiap.sus.resultados.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.resultados.application.event.ResultadoExameDisponivelEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.exames.api.ExameQuery;
 import br.com.fiap.sus.resultados.application.dto.RegistrarResultadoImagemDTO;
@@ -70,6 +72,7 @@ class RegistrarResultadoImagemUseCaseTest {
         ResultadoExameOutput resultado = useCase.executar(dtoValido());
 
         assertThat(resultado.tipoResultado()).isEqualTo(TipoResultado.IMAGEM);
+        verify(eventPublisher).publishEvent(any(ResultadoExameDisponivelEvent.class));
     }
 
     @Test

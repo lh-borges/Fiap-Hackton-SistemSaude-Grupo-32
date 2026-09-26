@@ -1,10 +1,12 @@
 package br.com.fiap.sus.exames.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.exames.application.event.ExameAgendadoEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.exames.application.dto.AgendarExameDTO;
 import br.com.fiap.sus.exames.application.dto.ExameOutput;
@@ -77,6 +79,7 @@ class AgendarExameUseCaseTest {
 
         assertThat(resultado.situacao()).isEqualTo(SituacaoExame.AGENDADO);
         assertThat(resultado.unidadeSaudeId()).isEqualTo(unidadeSaudeId);
+        verify(eventPublisher).publishEvent(any(ExameAgendadoEvent.class));
     }
 
     @Test

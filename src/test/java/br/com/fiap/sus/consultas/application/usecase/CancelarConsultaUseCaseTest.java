@@ -1,10 +1,12 @@
 package br.com.fiap.sus.consultas.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.consultas.application.event.ConsultaCanceladaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.consultas.application.dto.CancelarConsultaDTO;
 import br.com.fiap.sus.consultas.application.dto.ConsultaOutput;
@@ -73,6 +75,7 @@ class CancelarConsultaUseCaseTest {
         ConsultaOutput resultado = useCase.executar(new CancelarConsultaDTO(consultaId, "Motivo"));
 
         assertThat(resultado.situacao()).isEqualTo(SituacaoConsulta.CANCELADA);
+        verify(eventPublisher).publishEvent(any(ConsultaCanceladaEvent.class));
     }
 
     @Test

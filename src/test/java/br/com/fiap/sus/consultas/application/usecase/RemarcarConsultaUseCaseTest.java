@@ -1,10 +1,12 @@
 package br.com.fiap.sus.consultas.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.consultas.application.event.ConsultaRemarcadaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.consultas.application.dto.ConsultaOutput;
 import br.com.fiap.sus.consultas.application.dto.RemarcarConsultaDTO;
@@ -74,6 +76,7 @@ class RemarcarConsultaUseCaseTest {
                 new RemarcarConsultaDTO(consultaId, Instant.now().plus(5, ChronoUnit.DAYS)));
 
         assertThat(resultado.remarcada()).isTrue();
+        verify(eventPublisher).publishEvent(any(ConsultaRemarcadaEvent.class));
     }
 
     @Test

@@ -1,10 +1,12 @@
 package br.com.fiap.sus.receitas.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.receitas.application.event.ReceitaEmitidaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.receitas.application.dto.EmitirReceitaDTO;
 import br.com.fiap.sus.receitas.application.dto.ItemReceitaDTO;
@@ -78,6 +80,7 @@ class EmitirReceitaUseCaseTest {
         assertThat(resultado.medicoId()).isEqualTo(medicoId);
         assertThat(resultado.situacao()).isEqualTo(SituacaoReceita.ATIVA);
         assertThat(resultado.itens()).hasSize(1);
+        verify(eventPublisher).publishEvent(any(ReceitaEmitidaEvent.class));
     }
 
     @Test

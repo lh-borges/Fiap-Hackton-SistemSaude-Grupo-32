@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.consultas.application.event.ConsultaAgendadaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.consultas.application.dto.AgendarConsultaDTO;
 import br.com.fiap.sus.consultas.application.dto.ConsultaOutput;
@@ -75,6 +76,7 @@ class AgendarConsultaUseCaseTest {
 
         assertThat(resultado.pacienteId()).isEqualTo(pacienteId);
         verify(consultaRepository).salvar(any(Consulta.class));
+        verify(eventPublisher).publishEvent(any(ConsultaAgendadaEvent.class));
     }
 
     @Test

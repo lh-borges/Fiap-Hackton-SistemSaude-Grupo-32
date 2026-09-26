@@ -1,10 +1,12 @@
 package br.com.fiap.sus.exames.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.exames.application.event.ExameSolicitadoEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.exames.application.dto.SolicitacaoExameOutput;
 import br.com.fiap.sus.exames.application.dto.SolicitarExameDTO;
@@ -73,6 +75,7 @@ class SolicitarExameUseCaseTest {
 
         assertThat(resultado.medicoId()).isEqualTo(medicoId);
         assertThat(resultado.situacao()).isEqualTo(SituacaoSolicitacaoExame.PENDENTE);
+        verify(eventPublisher).publishEvent(any(ExameSolicitadoEvent.class));
     }
 
     @Test
