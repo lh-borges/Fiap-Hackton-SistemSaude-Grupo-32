@@ -21,6 +21,24 @@ spring:
     baseline-on-migrate: true
   jackson:
     default-property-inclusion: non_null
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  modulith:
+    events:
+      # Artigo VI.4: a aplicacao opera sem Kafka. A externalizacao so liga por variavel de
+      # ambiente (o perfil docker liga por padrao); o listener em memoria do Modulith
+      # continua gerando as notificacoes em qualquer cenario.
+      externalization:
+        enabled: ${MESSAGING_ENABLED:false}
+      # Reentrega, na proxima subida, os eventos cuja entrega nao foi concluida.
+      republish-outstanding-events-on-restart: true
+      jdbc:
+        # Artigo V.1: a tabela event_publication vem da migration V0091, nao da biblioteca.
+        schema-initialization:
+          enabled: false
 
 server:
   port: ${APP_PORT:8080}
