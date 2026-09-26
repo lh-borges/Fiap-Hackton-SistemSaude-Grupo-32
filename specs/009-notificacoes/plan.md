@@ -132,9 +132,9 @@ CREATE TABLE not_notificacao (
     mensagem       VARCHAR(500) NOT NULL,
     referencia_id  UUID,
     lida           BOOLEAN NOT NULL DEFAULT FALSE,
-    data_leitura   TIMESTAMPTZ,
-    criado_em      TIMESTAMPTZ NOT NULL,
-    atualizado_em  TIMESTAMPTZ NOT NULL,
+    data_leitura   TIMESTAMP WITH TIME ZONE,
+    criado_em      TIMESTAMP WITH TIME ZONE NOT NULL,
+    atualizado_em  TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT ck_not_tipo CHECK (tipo IN ('CONSULTA_AGENDADA', 'CONSULTA_REMARCADA', 'CONSULTA_CANCELADA',
         'EXAME_SOLICITADO', 'EXAME_AGENDADO', 'RESULTADO_DISPONIVEL', 'PARECER_CRIADO',
         'RECEITA_EMITIDA', 'RECEITA_RENOVADA', 'DOCUMENTO_EMITIDO')),
@@ -143,18 +143,18 @@ CREATE TABLE not_notificacao (
 );
 
 CREATE INDEX idx_not_notificacao_usuario_criado ON not_notificacao (usuario_id, criado_em DESC);
-CREATE INDEX idx_not_notificacao_usuario_nao_lida ON not_notificacao (usuario_id) WHERE lida = FALSE;
+CREATE INDEX idx_not_notificacao_usuario_lida ON not_notificacao (usuario_id, lida);
 
 CREATE TABLE not_evento_processado (
     evento_id      UUID PRIMARY KEY,
     tipo_evento    VARCHAR(80) NOT NULL,
-    processado_em  TIMESTAMPTZ NOT NULL
+    processado_em  TIMESTAMP WITH TIME ZONE NOT NULL
 );
 ```
 
 | Tabela | Colunas-chave | Índices | Observações |
 |---|---|---|---|
-| `not_notificacao` | `usuario_id`, `evento_id` | por usuário + data (listagem); parcial por não lida (contagem barata, RNF) | `uk_not_evento_usuario` garante RN-03 no banco |
+| `not_notificacao` | `usuario_id`, `evento_id` | por usuário + data (listagem); por usuário + lida (contagem barata, RNF; índice parcial foi descartado por não existir no H2 dos testes) | `uk_not_evento_usuario` garante RN-03 no banco |
 | `not_evento_processado` | `evento_id` | PK | marcador de idempotência (Artigo VI.3) |
 
 ### `V0091__infra_event_publication.sql`

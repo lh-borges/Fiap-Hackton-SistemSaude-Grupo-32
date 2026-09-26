@@ -12,9 +12,9 @@ CREATE TABLE not_notificacao (
     mensagem       VARCHAR(500) NOT NULL,
     referencia_id  UUID,
     lida           BOOLEAN NOT NULL DEFAULT FALSE,
-    data_leitura   TIMESTAMPTZ,
-    criado_em      TIMESTAMPTZ NOT NULL,
-    atualizado_em  TIMESTAMPTZ NOT NULL,
+    data_leitura   TIMESTAMP WITH TIME ZONE,
+    criado_em      TIMESTAMP WITH TIME ZONE NOT NULL,
+    atualizado_em  TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT ck_not_tipo CHECK (tipo IN (
         'CONSULTA_AGENDADA', 'CONSULTA_REMARCADA', 'CONSULTA_CANCELADA',
         'EXAME_SOLICITADO', 'EXAME_AGENDADO',
@@ -28,12 +28,12 @@ CREATE TABLE not_notificacao (
 
 -- Listagem do proprio usuario, da mais recente para a mais antiga.
 CREATE INDEX idx_not_notificacao_usuario_criado ON not_notificacao (usuario_id, criado_em DESC);
--- Contagem de nao lidas e consultada com frequencia (RNF): indice parcial.
-CREATE INDEX idx_not_notificacao_usuario_nao_lida ON not_notificacao (usuario_id) WHERE lida = FALSE;
+-- Contagem de nao lidas e consultada com frequencia (RNF).
+CREATE INDEX idx_not_notificacao_usuario_lida ON not_notificacao (usuario_id, lida);
 
 -- Marcador de idempotencia do consumidor (Artigo VI.3).
 CREATE TABLE not_evento_processado (
     evento_id      UUID PRIMARY KEY,
     tipo_evento    VARCHAR(80) NOT NULL,
-    processado_em  TIMESTAMPTZ NOT NULL
+    processado_em  TIMESTAMP WITH TIME ZONE NOT NULL
 );
