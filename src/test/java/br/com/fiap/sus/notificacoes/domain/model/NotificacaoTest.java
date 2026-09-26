@@ -25,7 +25,7 @@ class NotificacaoTest {
     @Test
     @DisplayName("HU-01: nasce nao lida, com identidade propria e textos normalizados")
     void nasceNaoLida() {
-        var antes = Instant.now();
+        var antes = Notificacao.agora();
         var n = nova();
         assertThat(n.getId()).isNotNull();
         assertThat(n.getUsuarioId()).isEqualTo(usuario);
@@ -37,6 +37,7 @@ class NotificacaoTest {
         assertThat(n.isLida()).isFalse();
         assertThat(n.getDataLeitura()).isNull();
         assertThat(n.getCriadoEm()).isBetween(antes, Instant.now());
+        assertThat(n.getCriadoEm().getNano() % 1000).as("precisao de microssegundos").isZero();
         assertThat(n.getAtualizadoEm()).isEqualTo(n.getCriadoEm());
     }
 

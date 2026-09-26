@@ -24,8 +24,10 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
+      # O externalizador do Modulith entrega o evento ja serializado em JSON como byte[];
+      # a chave e o pacienteId (texto). Ver @Externalized nos eventos.
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
   modulith:
     events:
       # Artigo VI.4: a aplicacao opera sem Kafka. A externalizacao so liga por variavel de

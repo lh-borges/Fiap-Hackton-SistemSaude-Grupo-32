@@ -4,6 +4,7 @@ import br.com.fiap.sus.notificacoes.domain.enums.TipoNotificacao;
 import br.com.fiap.sus.shared.domain.exception.RegraDeNegocioException;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -75,10 +76,18 @@ public final class Notificacao {
         return tratado;
     }
 
+    /**
+     * Instante com precisao de microssegundos, a mesma que o banco guarda: assim a resposta
+     * montada em memoria e a relida do banco sao identicas.
+     */
+    public static Instant agora() {
+        return Instant.now().truncatedTo(ChronoUnit.MICROS);
+    }
+
     /** HU-01: toda notificacao nasce nao lida. */
     public static Notificacao criar(UUID usuarioId, UUID eventoId, TipoNotificacao tipo, String titulo,
                                     String mensagem, UUID referenciaId) {
-        Instant agora = Instant.now();
+        Instant agora = agora();
         return new Notificacao(UUID.randomUUID(), usuarioId, eventoId, tipo, titulo, mensagem, referenciaId,
                 false, null, agora, agora);
     }
@@ -115,7 +124,7 @@ public final class Notificacao {
     }
 
     public boolean marcarComoLida() {
-        return marcarComoLida(Instant.now());
+        return marcarComoLida(agora());
     }
 
     public UUID getId() { return id; }
