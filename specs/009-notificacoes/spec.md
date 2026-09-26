@@ -1,7 +1,7 @@
 # Especificação — Notificações
 
 - **ID:** `009-notificacoes` · **Módulo:** `notificacoes` · **Responsável:** Danilo
-- **Status:** Aprovada · **Criada em:** 2026-09-03 · **Aprovada em:** 2026-09-25
+- **Status:** Implementada · **Criada em:** 2026-09-03 · **Aprovada em:** 2026-09-25 · **Implementada em:** 2026-09-25
 - **Herda de:** `specs/000-plataforma-sus/spec.md`
 
 ## 1. Contexto e problema
@@ -150,13 +150,13 @@ Contrato detalhado em `specs/000-plataforma-sus/events.md`.
 
 ## 12. Definition of Done
 
-- [ ] RF-01 a RF-08 implementados e testados
-- [ ] Teste: reprocessamento do mesmo fato não duplica notificação
-- [ ] Teste: usuário não lê nem marca notificação de terceiro
-- [ ] Teste: fluxo clínico conclui com o canal de mensageria indisponível
-- [ ] Teste: mensagem gerada não contém conteúdo clínico
-- [ ] Cobertura dos dez fatos previstos em RF-08
-- [ ] Contrato OpenAPI publicado
+- [x] RF-01 a RF-08 implementados e testados
+- [x] Teste: reprocessamento do mesmo fato não duplica notificação
+- [x] Teste: usuário não lê nem marca notificação de terceiro
+- [x] Teste: fluxo clínico conclui com o canal de mensageria indisponível
+- [x] Teste: mensagem gerada não contém conteúdo clínico
+- [x] Cobertura dos dez fatos previstos em RF-08
+- [x] Contrato OpenAPI publicado
 
 ## 13. Pendências
 

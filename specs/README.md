@@ -9,9 +9,9 @@
 | 004 | Solicitação e realização de exames | `exames` | Thiago | ✅ Implementada | [spec](004-exames/spec.md) | — | — |
 | 005 | Resultados de exame | `resultados` | Thiago | ✅ Implementada | [spec](005-resultados/spec.md) | — | — |
 | 006 | Parecer médico | `pareceres` | Juliana | ✅ Implementada | [spec](006-pareceres/spec.md) | — | — |
-| 007 | Receitas | `receitas` | Thiago | ✅ Implementada | [spec](007-receitas/spec.md) | — | — |'
+| 007 | Receitas | `receitas` | Thiago | ✅ Implementada | [spec](007-receitas/spec.md) | — | — |
 | 008 | Documentos médicos | `documentos` | Juliana | ✅ Implementada | [spec](008-documentos/spec.md) | — | — |
-| 009 | Notificações | `notificacoes` | Danilo | Aprovada (em implementação) | [spec](009-notificacoes/spec.md) | [plan](009-notificacoes/plan.md) | [tasks](009-notificacoes/tasks.md) |
+| 009 | Notificações | `notificacoes` | Danilo | ✅ Implementada | [spec](009-notificacoes/spec.md) | [plan](009-notificacoes/plan.md) | [tasks](009-notificacoes/tasks.md) |
 
 ## Documentos transversais
 
@@ -23,10 +23,10 @@
 ## Ordem de execução
 
 ```
-001 ✅ → 002 ✅ → 003 → 004 → 005 → 006
-                          ↓      ↓
-                         007    008
-009 em paralelo, contra events.md
+001 ✅ → 002 ✅ → 003 ✅ → 004 ✅ → 005 ✅ → 006 ✅
+                                ↓        ↓
+                               007 ✅   008 ✅
+009 ✅ consome os eventos de 003 a 008 (events.md)
 ```
 
 ## O que já está de pé

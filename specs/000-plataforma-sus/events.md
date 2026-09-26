@@ -21,7 +21,7 @@ verdade: `009-notificacoes` é desenvolvido contra ele.
 5. Publicado pelo caso de uso via `ApplicationEventPublisher` **dentro de um método
    `@Transactional`**. O listener do Modulith é transacional: evento publicado fora de
    transação é descartado silenciosamente. A entrega ocorre após o commit.
-6. Externalizado para Kafka com `@Externalized("sus.<modulo>.<evento>.v1::#{pacienteId()}")`
+6. Externalizado para Kafka com `@Externalized("sus.<modulo>.<evento>.v1::#{#this.pacienteId()}")`
    (o `pacienteId` é a chave da partição, preservando a ordem por paciente).
 7. Consumidor é idempotente por `eventoId` (tabela `not_evento_processado`).
 8. Evolução: campo novo é opcional; mudança incompatível cria a versão `.v2` do tópico.
@@ -61,23 +61,20 @@ O módulo `resultados` não guarda o médico solicitante; ele está na solicita�
 A porta `exames::api` ganha o método `Optional<UUID> medicoSolicitanteIdDoExame(UUID exameId)`,
 que `resultados` usa para preencher o evento.
 
-## Estado por produtor (2026-09-25)
+## Estado por produtor
 
-| Módulo | Situação | O que falta |
-|---|---|---|
-| `consultas` | não publica | 3 eventos, `@Transactional` nos 3 casos de uso, `package-info` do pacote `events` |
-| `exames` | não publica | 2 eventos, `@Transactional`, `package-info`, método novo em `ExameQuery` |
-| `resultados` | não publica | 1 evento publicado por 2 casos de uso, `@Transactional`, `package-info` |
-| `pareceres` | publica `ParecerCriadoEvent` com `@NamedInterface("events")` | `eventoId`, `ocorridoEm`, `EventoDominio`, `@Externalized` |
-| `receitas` | não publica | 2 eventos, `@Transactional`, `package-info` |
-| `documentos` | publica `DocumentoEmitidoEvent` sem exportar o pacote | `package-info` com `@NamedInterface("events")`, `eventoId`, `ocorridoEm`, `EventoDominio`, `@Externalized`, `@Transactional` |
+Todos os dez eventos estão implementados e publicados (2026-09-25). Cada produtor tem o
+pacote `application.event` exportado como `events`, os casos de uso são `@Transactional` e
+os testes unitários verificam a publicação. `DocumentoEmitidoEvent.tipo` e
+`ResultadoExameDisponivelEvent.tipoResultado` viajam como texto, para que o contrato não
+dependa dos enums internos dos módulos.
 
 ## Exemplo
 
 ```java
 package br.com.fiap.sus.resultados.application.event;
 
-@Externalized("sus.resultados.disponivel.v1::#{pacienteId()}")
+@Externalized("sus.resultados.disponivel.v1::#{#this.pacienteId()}")
 public record ResultadoExameDisponivelEvent(
         UUID eventoId,
         Instant ocorridoEm,

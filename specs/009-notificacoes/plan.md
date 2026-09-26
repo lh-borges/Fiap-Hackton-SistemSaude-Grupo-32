@@ -3,7 +3,7 @@
 - **Spec de origem:** `./spec.md` (Aprovada em 2026-09-25)
 - **Módulo Spring Modulith:** `br.com.fiap.sus.notificacoes`
 - **Responsável:** Danilo
-- **Status:** Aprovado
+- **Status:** Implementado
 - **Herda de:** `specs/000-plataforma-sus/plan.md` · **Contrato de eventos:** `specs/000-plataforma-sus/events.md`
 
 ---
