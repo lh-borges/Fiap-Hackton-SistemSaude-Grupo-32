@@ -158,25 +158,31 @@ Invariante: receita tem no mínimo um item.
 
 ## Módulo `notificacoes` — V0080..V0089
 
-### `not_notificacao`
-`id` UUID PK · `usuario_id` REF · `tipo` varchar(40) · `titulo` varchar(150) ·
+> `documentos` ocupou `V0080` e `V0081`; o módulo usa `V0082` em diante (registrado no
+> `plan.md` da feature 009).
+
+### `not_notificacao` — `V0082`
+`id` UUID PK · `usuario_id` REF · `evento_id` UUID · `tipo` varchar(40) · `titulo` varchar(150) ·
 `mensagem` varchar(500) · `referencia_id` UUID null · `lida` boolean default false ·
-`data_leitura` timestamptz null · `criado_em` timestamptz.
+`data_leitura` timestamptz null · `criado_em` timestamptz · `atualizado_em` timestamptz.
+`UNIQUE (evento_id, usuario_id)` garante que o mesmo fato não gera duas notificações para o
+mesmo destinatário.
 
 `referencia_id` aponta para o registro de origem (consulta, exame, resultado…) apenas para
 navegação; sem FK.
 
-### `not_evento_processado`
-`evento_id` UUID PK · `processado_em` timestamptz — deduplicação para idempotência do
-consumidor.
+### `not_evento_processado` — `V0082`
+`evento_id` UUID PK · `tipo_evento` varchar(80) · `processado_em` timestamptz — deduplicação
+para idempotência do consumidor.
 
 ---
 
 ## Infraestrutura — V0090..V0099
 
-### `event_publication`
+### `event_publication` — `V0091`
 Tabela do Spring Modulith para publicação transacional de eventos (schema fornecido pela
 biblioteca; a migration apenas a cria explicitamente em vez de deixar o `ddl-auto` fazer).
+`V0090` já está ocupada pelo seed de catálogos.
 
 ---
 

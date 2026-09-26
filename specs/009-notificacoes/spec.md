@@ -1,7 +1,7 @@
 # Especificação — Notificações
 
 - **ID:** `009-notificacoes` · **Módulo:** `notificacoes` · **Responsável:** Danilo
-- **Status:** Em revisão · **Criada em:** 2026-09-03
+- **Status:** Aprovada · **Criada em:** 2026-09-03 · **Aprovada em:** 2026-09-25
 - **Herda de:** `specs/000-plataforma-sus/spec.md`
 
 ## 1. Contexto e problema
@@ -26,9 +26,9 @@ gerados de forma desacoplada dos módulos que os produzem.
 
 | Ator | O que pode fazer |
 |---|---|
-| ADMINISTRADOR | Consultar as próprias notificações |
-| ATENDENTE | Consultar as próprias notificações |
-| MEDICO | Consultar as próprias notificações |
+| ADMINISTRADOR | Consultar as próprias notificações e marcá-las como lidas |
+| ATENDENTE | Consultar as próprias notificações e marcá-las como lidas |
+| MEDICO | Consultar as próprias notificações e marcá-las como lidas |
 | PACIENTE | Consultar as próprias notificações e marcá-las como lidas |
 
 Ninguém lê a notificação de outra pessoa — nem o administrador.
@@ -106,6 +106,9 @@ Então ela identifica o registro de origem para que eu possa consultá-lo
 | RN-05 | A mensagem não contém dado clínico: informa que existe um registro, não o seu conteúdo |
 | RN-06 | Falha ao gerar notificação não desfaz a operação clínica que a originou |
 | RN-07 | Notificação não é excluída pelo usuário no MVP |
+| RN-08 | O médico é notificado do agendamento, da remarcação e do cancelamento das consultas em que é o profissional responsável, além do paciente |
+| RN-09 | O resultado de exame fica disponível ao paciente assim que é registrado (decisão da spec-mãe); por isso "resultado disponível" notifica o paciente e o médico solicitante |
+| RN-10 | Um fato cujo destinatário não pode ser resolvido (paciente ou médico sem usuário vinculado) é descartado para aquele destinatário, sem afetar os demais |
 
 ## 8. Fluxos de exceção
 
@@ -152,13 +155,17 @@ Contrato detalhado em `specs/000-plataforma-sus/events.md`.
 - [ ] Teste: usuário não lê nem marca notificação de terceiro
 - [ ] Teste: fluxo clínico conclui com o canal de mensageria indisponível
 - [ ] Teste: mensagem gerada não contém conteúdo clínico
-- [ ] Cobertura dos onze fatos previstos
+- [ ] Cobertura dos dez fatos previstos em RF-08
 - [ ] Contrato OpenAPI publicado
 
 ## 13. Pendências
 
-- [NEEDS CLARIFICATION: o médico deve ser notificado do agendamento e do cancelamento das suas consultas, ou só o paciente? (Assumido: ambos.)]
-- [NEEDS CLARIFICATION: se o resultado só ficar visível ao paciente após o parecer, a notificação de "resultado disponível" vai só para o médico? Depende da pendência da spec-mãe.]
+Nenhuma. Decisões tomadas em 2026-09-25 (Danilo):
+
+| Pergunta original | Decisão |
+|---|---|
+| O médico deve ser notificado do agendamento e do cancelamento das suas consultas, ou só o paciente? | Ambos. Registrado em RN-08. |
+| Se o resultado só ficar visível ao paciente após o parecer, "resultado disponível" vai só para o médico? | O resultado fica visível de imediato; notifica paciente e médico solicitante. Registrado em RN-09. |
 
 ## 14. Dependências
 

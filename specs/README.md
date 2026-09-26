@@ -11,7 +11,7 @@
 | 006 | Parecer médico | `pareceres` | Juliana | ✅ Implementada | [spec](006-pareceres/spec.md) | — | — |
 | 007 | Receitas | `receitas` | Thiago | ✅ Implementada | [spec](007-receitas/spec.md) | — | — |'
 | 008 | Documentos médicos | `documentos` | Juliana | ✅ Implementada | [spec](008-documentos/spec.md) | — | — |
-| 009 | Notificações | `notificacoes` | Danilo | Em revisão | [spec](009-notificacoes/spec.md) | — | — |
+| 009 | Notificações | `notificacoes` | Danilo | Aprovada (em implementação) | [spec](009-notificacoes/spec.md) | [plan](009-notificacoes/plan.md) | [tasks](009-notificacoes/tasks.md) |
 
 ## Documentos transversais
 
