@@ -20,4 +20,7 @@ public interface ExameQuery {
 
     /** Resolve, a partir do exame, o tipo de exame da solicitacao de origem. */
     Optional<UUID> tipoExameIdDoExame(UUID exameId);
+
+    /** Medico que solicitou o exame; usado por resultados para notificar quem pediu (feature 009). */
+    Optional<UUID> medicoSolicitanteIdDoExame(UUID exameId);
 }

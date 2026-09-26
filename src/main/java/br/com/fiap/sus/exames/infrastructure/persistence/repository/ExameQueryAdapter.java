@@ -44,4 +44,11 @@ public class ExameQueryAdapter implements ExameQuery {
                 .flatMap(exame -> solicitacaoJpa.findById(exame.getSolicitacaoExameId()))
                 .map(s -> s.getTipoExameId());
     }
+
+    @Override
+    public Optional<UUID> medicoSolicitanteIdDoExame(UUID exameId) {
+        return exameJpa.findById(exameId)
+                .flatMap(exame -> solicitacaoJpa.findById(exame.getSolicitacaoExameId()))
+                .map(s -> s.getMedicoId());
+    }
 }

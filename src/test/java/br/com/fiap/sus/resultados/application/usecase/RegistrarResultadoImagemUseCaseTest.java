@@ -22,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +37,11 @@ class RegistrarResultadoImagemUseCaseTest {
     @Mock
     private CadastroQuery cadastroQuery;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private RegistrarResultadoImagemUseCase useCase;
 
     private final UUID exameId = UUID.randomUUID();
@@ -44,7 +50,7 @@ class RegistrarResultadoImagemUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new RegistrarResultadoImagemUseCase(resultadoExameRepository, exameQuery, cadastroQuery);
+        useCase = new RegistrarResultadoImagemUseCase(resultadoExameRepository, exameQuery, cadastroQuery, eventPublisher);
     }
 
     private RegistrarResultadoImagemDTO dtoValido() {

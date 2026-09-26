@@ -27,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +42,11 @@ class RenovarReceitaUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private RenovarReceitaUseCase useCase;
 
     private final UUID pacienteId = UUID.randomUUID();
@@ -52,7 +58,7 @@ class RenovarReceitaUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new RenovarReceitaUseCase(receitaRepository, cadastroQuery, usuarioAutenticadoProvider);
+        useCase = new RenovarReceitaUseCase(receitaRepository, cadastroQuery, usuarioAutenticadoProvider, eventPublisher);
     }
 
     /** Programa o medico autenticado (chamado antes de tudo dentro do usecase). */

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +40,11 @@ class RemarcarConsultaUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private RemarcarConsultaUseCase useCase;
 
     private final UUID pacienteId = UUID.randomUUID();
@@ -46,7 +52,7 @@ class RemarcarConsultaUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new RemarcarConsultaUseCase(consultaRepository, cadastroQuery, usuarioAutenticadoProvider);
+        useCase = new RemarcarConsultaUseCase(consultaRepository, cadastroQuery, usuarioAutenticadoProvider, eventPublisher);
     }
 
     private Consulta consultaAgendada() {

@@ -66,7 +66,13 @@ class RegistrarParecerUseCaseTest {
         var ordem = inOrder(repository, events);
         ordem.verify(repository).salvar(any(ParecerMedico.class), eq(usuario));
         ordem.verify(events).publishEvent(event.capture());
-        assertThat(event.getValue()).isEqualTo(new ParecerCriadoEvent(output.id(), resultado, paciente, medico, output.dataParecer()));
+        assertThat(event.getValue().eventoId()).isNotNull();
+        assertThat(event.getValue().ocorridoEm()).isNotNull();
+        assertThat(event.getValue().parecerId()).isEqualTo(output.id());
+        assertThat(event.getValue().resultadoExameId()).isEqualTo(resultado);
+        assertThat(event.getValue().pacienteId()).isEqualTo(paciente);
+        assertThat(event.getValue().medicoId()).isEqualTo(medico);
+        assertThat(event.getValue().dataParecer()).isEqualTo(output.dataParecer());
         verify(cadastros, times(1)).resumoDoMedico(medico);
     }
 
