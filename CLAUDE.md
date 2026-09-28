@@ -85,7 +85,7 @@ Swagger em `/swagger-ui.html`. Perfis: `local` e `docker`. Não há Maven wrappe
 | Thiago | Consultas, exames, resultados, receitas | `003`, `004`, `005`, `007` |
 | Juliana | Clínico e qualidade | `006-pareceres`, `008-documentos`, testes |
 | Gilmar | Infraestrutura | Docker, Compose, Postgres, Flyway |
-| Danilo | Mensageria e entrega | `009-notificacoes`, Kafka, relatório e vídeo |
+| Danilo | Mensageria e entrega | `009-notificacoes`, `010-historico`, Kafka, relatório e vídeo |
 
 ## O que NÃO fazer
 

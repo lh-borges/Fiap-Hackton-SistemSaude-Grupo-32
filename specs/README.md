@@ -12,6 +12,7 @@
 | 007 | Receitas | `receitas` | Thiago | ✅ Implementada | [spec](007-receitas/spec.md) | — | — |
 | 008 | Documentos médicos | `documentos` | Juliana | ✅ Implementada | [spec](008-documentos/spec.md) | — | — |
 | 009 | Notificações | `notificacoes` | Danilo | ✅ Implementada | [spec](009-notificacoes/spec.md) | [plan](009-notificacoes/plan.md) | [tasks](009-notificacoes/tasks.md) |
+| 010 | Histórico do paciente | `historico` | Danilo | ✅ Implementada | [spec](010-historico/spec.md) | [plan](010-historico/plan.md) | [tasks](010-historico/tasks.md) |
 
 ## Documentos transversais
 
@@ -27,22 +28,22 @@
                                 ↓        ↓
                                007 ✅   008 ✅
 009 ✅ consome os eventos de 003 a 008 (events.md)
+010 ✅ lê as portas `api` de 002 a 008 (linha do tempo derivada)
 ```
 
 ## O que já está de pé
 
-`001` e `002` estão implementados e verificados: aplicação sobe, Flyway aplica as 5
-migrations, autenticação JWT funciona, autorização por perfil e por posse do dado foi
-testada em execução (401 sem token, 403 por perfil, 404 em dado de terceiro).
+As dez features estão implementadas e verificadas por `mvn verify -Pquality`: fronteiras de
+módulo (Spring Modulith), regra da dependência (ArchUnit), teste de módulo com eventos e gate
+de cobertura de 80%. A aplicação sobe no `docker compose` com Postgres e Kafka.
 
-O módulo `cadastros` publica a porta `CadastroQuery`, que é por onde `003`, `004` e `005`
-devem validar paciente, médico, unidade e tipo de exame — sem FK e sem acessar as tabelas
-de outro módulo.
+Cada módulo clínico publica uma porta de leitura no seu pacote `api` (`CadastroQuery`,
+`ConsultaQuery`, `ExameQuery`, `ResultadoQuery`, `ParecerQuery`, `ReceitaQuery`,
+`DocumentoQuery`). É por elas que os módulos se validam entre si e que `010` monta o histórico,
+sem FK e sem acessar tabela alheia.
 
-## Bloqueios para as próximas features
+## Pendências
 
-As pendências `[NEEDS CLARIFICATION]` da spec-mãe continuam abertas e precisam ser
-resolvidas antes de `/plan 003`. Duas mudam regra de negócio em `003`, `004`, `005` e `009`:
-
-1. Quem pode agendar consulta e exame: o paciente, ou apenas atendente e administrador?
-2. O resultado fica visível ao paciente imediatamente, ou só depois do parecer médico?
+As marcações `[NEEDS CLARIFICATION]` das specs `000` a `008` continuam registradas nas
+próprias specs. As features foram implementadas com as premissas assumidas em cada uma
+(indicadas ao lado da pergunta); `009` e `010` não têm pendência.
