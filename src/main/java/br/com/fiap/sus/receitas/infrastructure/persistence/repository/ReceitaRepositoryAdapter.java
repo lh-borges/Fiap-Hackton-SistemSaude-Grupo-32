@@ -88,4 +88,16 @@ public class ReceitaRepositoryAdapter implements ReceitaRepository {
 
         return spec;
     }
+
+    @Override
+    public List<Receita> listarPorPaciente(UUID pacienteId) {
+        List<ReceitaEntity> entidades = receitaJpa.findByPacienteIdOrderByDataEmissaoDesc(pacienteId);
+        List<UUID> ids = entidades.stream().map(ReceitaEntity::getId).toList();
+        Map<UUID, List<ItemReceitaEntity>> itensPorReceita = ids.isEmpty() ? Map.of() : itemJpa
+                .findByReceitaIdIn(ids).stream()
+                .collect(Collectors.groupingBy(ItemReceitaEntity::getReceitaId));
+        return entidades.stream()
+                .map(e -> mapper.paraDominio(e, itensPorReceita.getOrDefault(e.getId(), List.of())))
+                .toList();
+    }
 }

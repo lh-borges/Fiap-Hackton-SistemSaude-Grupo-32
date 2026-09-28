@@ -1,6 +1,9 @@
 package br.com.fiap.sus.consultas.infrastructure.persistence.repository;
 
 import br.com.fiap.sus.consultas.api.ConsultaQuery;
+import br.com.fiap.sus.consultas.api.ConsultaResumo;
+import br.com.fiap.sus.consultas.infrastructure.persistence.entity.ConsultaEntity;
+import java.util.List;
 import br.com.fiap.sus.consultas.domain.enums.SituacaoConsulta;
 import java.time.Instant;
 import java.util.Optional;
@@ -31,5 +34,17 @@ public class ConsultaQueryAdapter implements ConsultaQuery {
     @Override
     public Optional<Instant> dataHoraDaConsulta(UUID consultaId) {
         return repository.dataHoraDaConsulta(consultaId);
+    }
+
+    @Override
+    public List<ConsultaResumo> consultasDoPaciente(UUID pacienteId) {
+        return repository.findByPacienteIdOrderByDataHoraDesc(pacienteId).stream()
+                .map(ConsultaQueryAdapter::resumo)
+                .toList();
+    }
+
+    private static ConsultaResumo resumo(ConsultaEntity c) {
+        return new ConsultaResumo(c.getId(), c.getPacienteId(), c.getMedicoId(), c.getUnidadeSaudeId(),
+                c.getDataHora(), c.getSituacao().name(), c.isRemarcada());
     }
 }

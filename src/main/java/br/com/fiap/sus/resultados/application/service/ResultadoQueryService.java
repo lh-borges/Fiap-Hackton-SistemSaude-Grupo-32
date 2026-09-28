@@ -5,6 +5,7 @@ import br.com.fiap.sus.resultados.api.ResultadoResumo;
 import br.com.fiap.sus.resultados.domain.model.ResultadoExame;
 import br.com.fiap.sus.resultados.domain.repository.ResultadoExameRepository;
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,5 +43,11 @@ public class ResultadoQueryService implements ResultadoQuery {
                 resultado.getDescricao(),
                 resultado.getLaudo()
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ResultadoResumo> resultadosDoPaciente(UUID pacienteId) {
+        return repository.listarPorPaciente(pacienteId).stream().map(this::resumo).toList();
     }
 }

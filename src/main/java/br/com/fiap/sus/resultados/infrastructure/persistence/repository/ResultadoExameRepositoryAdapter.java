@@ -105,4 +105,16 @@ public class ResultadoExameRepositoryAdapter implements ResultadoExameRepository
 
         return spec;
     }
+
+    @Override
+    public List<ResultadoExame> listarPorPaciente(UUID pacienteId) {
+        List<ResultadoExameEntity> entidades = resultadoJpa.findByPacienteIdOrderByDataResultadoDesc(pacienteId);
+        List<UUID> ids = entidades.stream().map(ResultadoExameEntity::getId).toList();
+        Map<UUID, List<ItemResultadoLaboratorialEntity>> itensPorResultado = ids.isEmpty() ? Map.of() : itemJpa
+                .findByResultadoExameIdIn(ids).stream()
+                .collect(Collectors.groupingBy(ItemResultadoLaboratorialEntity::getResultadoExameId));
+        return entidades.stream()
+                .map(e -> mapper.paraDominio(e, itensPorResultado.getOrDefault(e.getId(), List.of())))
+                .toList();
+    }
 }

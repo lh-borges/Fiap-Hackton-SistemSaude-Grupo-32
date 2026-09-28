@@ -1,6 +1,7 @@
 package br.com.fiap.sus.documentos.infrastructure.persistence.repository;
 
 import br.com.fiap.sus.documentos.infrastructure.persistence.entity.DocumentoMedicoEntity;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -14,4 +15,6 @@ public interface DocumentoMedicoJpaRepository
     Optional<DocumentoMedicoEntity> findById(UUID id);
 
     boolean existsByConsultaId(UUID consultaId);
+
+    List<DocumentoMedicoEntity> findByPacienteIdOrderByDataEmissaoDesc(UUID pacienteId);
 }

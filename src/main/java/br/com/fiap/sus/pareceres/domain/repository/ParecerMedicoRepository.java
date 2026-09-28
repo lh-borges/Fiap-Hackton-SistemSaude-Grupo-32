@@ -3,6 +3,7 @@ package br.com.fiap.sus.pareceres.domain.repository;
 import br.com.fiap.sus.pareceres.domain.model.ParecerMedico;
 import br.com.fiap.sus.shared.domain.PaginaResultado;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,4 +20,7 @@ public interface ParecerMedicoRepository {
 
     /** RF-05: listagem por paciente, medico, resultado e periodo. */
     PaginaResultado<ParecerMedico> listar(ParecerMedicoFiltro filtro, int pagina, int tamanho);
+
+    /** Feature 010: todos os pareceres do paciente, do mais recente para o mais antigo. */
+    List<ParecerMedico> listarPorPaciente(UUID pacienteId);
 }

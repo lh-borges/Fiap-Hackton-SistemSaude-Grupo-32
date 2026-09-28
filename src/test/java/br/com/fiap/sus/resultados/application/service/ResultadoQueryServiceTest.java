@@ -58,6 +58,20 @@ class ResultadoQueryServiceTest {
         assertThat(service.resultadoDoExame(exameId)).isEmpty();
     }
 
+    @Test
+    void listaResumosDoPaciente() {
+        UUID pacienteId = UUID.randomUUID();
+        var primeiro = resultado(UUID.randomUUID(), UUID.randomUUID(), pacienteId);
+        var segundo = resultado(UUID.randomUUID(), UUID.randomUUID(), pacienteId);
+        when(repository.listarPorPaciente(pacienteId)).thenReturn(List.of(primeiro, segundo));
+
+        var resumos = service.resultadosDoPaciente(pacienteId);
+
+        assertThat(resumos).extracting(r -> r.id()).containsExactly(primeiro.getId(), segundo.getId());
+        assertThat(resumos.get(0).pacienteId()).isEqualTo(pacienteId);
+        assertThat(resumos.get(0).exameId()).isEqualTo(primeiro.getExameId());
+    }
+
     private ResultadoExame resultado(UUID resultadoId, UUID exameId, UUID pacienteId) {
         return ResultadoExame.reconstituir(
                 resultadoId,

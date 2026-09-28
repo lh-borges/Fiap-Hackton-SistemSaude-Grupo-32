@@ -1,10 +1,13 @@
 package br.com.fiap.sus.pareceres.application.service;
 
 import br.com.fiap.sus.pareceres.api.ParecerQuery;
+import br.com.fiap.sus.pareceres.api.ParecerResumo;
+import br.com.fiap.sus.pareceres.domain.model.ParecerMedico;
 import br.com.fiap.sus.pareceres.domain.repository.ParecerMedicoRepository;
 import br.com.fiap.sus.resultados.api.IndicadorParecerQuery;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,5 +30,14 @@ public class ParecerQueryService implements ParecerQuery, IndicadorParecerQuery 
     @Override
     public boolean existeParecerParaResultado(UUID resultadoExameId) {
         return parecerMedicoRepository.existePorResultadoExameId(resultadoExameId);
+    }
+
+    @Override
+    public List<ParecerResumo> pareceresDoPaciente(UUID pacienteId) {
+        return parecerMedicoRepository.listarPorPaciente(pacienteId).stream().map(ParecerQueryService::resumo).toList();
+    }
+
+    private static ParecerResumo resumo(ParecerMedico p) {
+        return new ParecerResumo(p.getId(), p.getResultadoExameId(), p.getPacienteId(), p.getMedicoId(), p.getDataParecer());
     }
 }
