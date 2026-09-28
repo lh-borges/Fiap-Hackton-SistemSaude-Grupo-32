@@ -104,20 +104,20 @@
 
 ## Resumo
 
-- **Total:** 48 tarefas (T901–T984), das quais 4 já concluídas nesta preparação.
+- **Total:** 48 tarefas (T901–T984), todas concluídas em 2026-09-25.
 - **Paralelizáveis:** 24 marcadas `[P]`.
 - **Caminho crítico:** T910 → T905/T912 → T914 → T921 → T922 → T932 → T943 → T960 → T961 → T980.
   As fases 7 (produtores) e 5 (apresentação) correm em paralelo com a 4 assim que a 3 termina.
 
 ## Definition of Done da feature
 
-- [ ] RF-01 a RF-08 cobertos por tarefa concluída e teste passando
-- [ ] Teste: reprocessamento do mesmo fato não duplica notificação (T935, T961)
-- [ ] Teste: usuário não lê nem marca notificação de terceiro (T937, T953)
-- [ ] Teste: fluxo clínico conclui com o canal de mensageria indisponível (T961 roda sem Kafka)
-- [ ] Teste: mensagem gerada não contém conteúdo clínico (T936)
-- [ ] Cobertura dos dez fatos de RF-08 (T960 + Fase 7)
-- [ ] Contrato OpenAPI publicado e Swagger conforme (T903, T951)
-- [ ] Build verde: `mvn verify -Pquality` (cobertura ≥ 80%, Modulith, ArchUnit)
-- [ ] `docker compose up` sobe Postgres, Kafka e API sem passo manual; tópicos visíveis
-- [ ] Spec, plano e catálogo de eventos descrevem o que o código faz
+- [x] RF-01 a RF-08 cobertos por tarefa concluída e teste passando
+- [x] Teste: reprocessamento do mesmo fato não duplica notificação (T935, T961)
+- [x] Teste: usuário não lê nem marca notificação de terceiro (T937, T953)
+- [x] Teste: fluxo clínico conclui com o canal de mensageria indisponível (T961 roda sem Kafka)
+- [x] Teste: mensagem gerada não contém conteúdo clínico (T936)
+- [x] Cobertura dos dez fatos de RF-08 (T960 + Fase 7)
+- [x] Contrato OpenAPI publicado e Swagger conforme (T903, T951)
+- [x] Build verde: `mvn verify -Pquality` (cobertura ≥ 80%, Modulith, ArchUnit)
+- [x] `docker compose up` sobe Postgres, Kafka e API sem passo manual; tópicos visíveis
+- [x] Spec, plano e catálogo de eventos descrevem o que o código faz
