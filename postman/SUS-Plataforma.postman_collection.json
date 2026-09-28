@@ -158,6 +158,10 @@
       "key": "tipoDocumento",
       "value": "ATESTADO",
       "type": "string"
+    },
+    {
+      "key": "notificacaoId",
+      "value": ""
     }
   ],
   "item": [
@@ -2262,7 +2266,283 @@
       ]
     },
     {
-      "name": "14. Testes de seguranca",
+      "name": "14. Notificacoes",
+      "description": "Feature 009. As notificacoes sao geradas pelos eventos das pastas anteriores (consulta agendada, exame solicitado, resultado, parecer, documento). Toda rota devolve apenas as do usuario do token.",
+      "item": [
+        {
+          "name": "Listar minhas notificacoes (paciente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"pagina com conteudo\", () => pm.expect(corpo.conteudo).to.be.an(\"array\"));",
+                  "pm.test(\"nunca expoe usuarioId\", () => corpo.conteudo.forEach(n => pm.expect(n).to.not.have.property(\"usuarioId\")));",
+                  "if (corpo.conteudo.length > 0) { pm.collectionVariables.set(\"notificacaoId\", corpo.conteudo[0].id); pm.environment.set(\"notificacaoId\", corpo.conteudo[0].id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPaciente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notificacoes?lida=false&pagina=0&tamanho=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificacoes"
+              ],
+              "query": [
+                {
+                  "key": "lida",
+                  "value": "false"
+                },
+                {
+                  "key": "pagina",
+                  "value": "0"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Da mais recente para a mais antiga. Salva notificacaoId (a mais recente)."
+          }
+        },
+        {
+          "name": "Contar nao lidas (paciente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"quantidade numerica\", () => pm.expect(pm.response.json().quantidade).to.be.a(\"number\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPaciente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notificacoes/nao-lidas/contagem",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificacoes",
+                "nao-lidas",
+                "contagem"
+              ]
+            },
+            "description": "RF-05: contagem barata de nao lidas."
+          }
+        },
+        {
+          "name": "Consultar notificacao (paciente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const n = pm.response.json();",
+                  "pm.test(\"identifica o registro de origem\", () => { pm.expect(n.recurso).to.be.a(\"string\"); pm.expect(n).to.have.property(\"referenciaId\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPaciente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notificacoes/{{notificacaoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificacoes",
+                "{{notificacaoId}}"
+              ]
+            },
+            "description": "HU-06: referenciaId + recurso permitem navegar ate o registro de origem."
+          }
+        },
+        {
+          "name": "Marcar como lida (paciente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const n = pm.response.json();",
+                  "pm.test(\"lida com data de leitura\", () => { pm.expect(n.lida).to.be.true; pm.expect(n.dataLeitura).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPaciente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notificacoes/{{notificacaoId}}/leitura",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificacoes",
+                "{{notificacaoId}}",
+                "leitura"
+              ]
+            },
+            "description": "RN-04: irreversivel e idempotente; repetir devolve 200 sem alterar a data."
+          }
+        },
+        {
+          "name": "Listar minhas notificacoes (medico)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"pagina com conteudo\", () => pm.expect(pm.response.json().conteudo).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notificacoes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificacoes"
+              ]
+            },
+            "description": "O medico recebe avisos de consulta (agendada, remarcada, cancelada) e de resultado que ele solicitou."
+          }
+        },
+        {
+          "name": "Seguranca: admin nao le notificacao do paciente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404 Not Found\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notificacoes/{{notificacaoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notificacoes",
+                "{{notificacaoId}}"
+              ]
+            },
+            "description": "HU-03: notificacao de terceiro e tratada como inexistente, mesmo para ADMINISTRADOR."
+          }
+        }
+      ]
+    },
+    {
+      "name": "15. Testes de seguranca",
       "description": "Demonstra o Artigo IV da constituicao: negar por padrao, autorizacao por perfil e posse do dado.",
       "item": [
         {
@@ -2466,6 +2746,402 @@
                 "me"
               ]
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "16. Historico do paciente",
+      "description": "Feature 010: linha do tempo derivada de consultas, solicitacoes, exames, resultados, pareceres, receitas e documentos. Sem tabela propria. Rode depois das pastas 8 a 13 para ter registros.",
+      "item": [
+        {
+          "name": "Paciente ve o proprio historico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"pagina com conteudo\", () => pm.expect(corpo.conteudo).to.be.an(\"array\"));",
+                  "pm.test(\"cada item tem tipo, recurso, id, data, titulo e situacao\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.include.all.keys(\"tipo\", \"recurso\", \"id\", \"data\", \"titulo\", \"situacao\");",
+                  "}));",
+                  "pm.test(\"nenhum item carrega conteudo clinico\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.not.have.any.keys(\"laudo\", \"descricao\", \"conteudo\", \"itens\", \"arquivoUrl\");",
+                  "}));",
+                  "pm.test(\"do mais recente para o mais antigo\", () => {",
+                  "  for (let k = 1; k < corpo.conteudo.length; k++) pm.expect(corpo.conteudo[k - 1].data >= corpo.conteudo[k].data).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPaciente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historico?pagina=0&tamanho=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "historico"
+              ],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "0"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "HU-01: o pacienteId vem do token. Deve listar a consulta, a solicitacao, o exame, o resultado, o parecer e o documento criados nas pastas anteriores."
+          }
+        },
+        {
+          "name": "Paciente passando outro pacienteId ve o proprio (RN-02)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"pagina com conteudo\", () => pm.expect(corpo.conteudo).to.be.an(\"array\"));",
+                  "pm.test(\"cada item tem tipo, recurso, id, data, titulo e situacao\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.include.all.keys(\"tipo\", \"recurso\", \"id\", \"data\", \"titulo\", \"situacao\");",
+                  "}));",
+                  "pm.test(\"nenhum item carrega conteudo clinico\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.not.have.any.keys(\"laudo\", \"descricao\", \"conteudo\", \"itens\", \"arquivoUrl\");",
+                  "}));",
+                  "pm.test(\"do mais recente para o mais antigo\", () => {",
+                  "  for (let k = 1; k < corpo.conteudo.length; k++) pm.expect(corpo.conteudo[k - 1].data >= corpo.conteudo[k].data).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPaciente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historico?pacienteId=00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "historico"
+              ],
+              "query": [
+                {
+                  "key": "pacienteId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
+            },
+            "description": "RN-02: o parametro e ignorado para PACIENTE; a resposta e a mesma da chamada anterior."
+          }
+        },
+        {
+          "name": "Paciente filtra por tipo e periodo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"pagina com conteudo\", () => pm.expect(corpo.conteudo).to.be.an(\"array\"));",
+                  "pm.test(\"cada item tem tipo, recurso, id, data, titulo e situacao\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.include.all.keys(\"tipo\", \"recurso\", \"id\", \"data\", \"titulo\", \"situacao\");",
+                  "}));",
+                  "pm.test(\"nenhum item carrega conteudo clinico\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.not.have.any.keys(\"laudo\", \"descricao\", \"conteudo\", \"itens\", \"arquivoUrl\");",
+                  "}));",
+                  "pm.test(\"do mais recente para o mais antigo\", () => {",
+                  "  for (let k = 1; k < corpo.conteudo.length; k++) pm.expect(corpo.conteudo[k - 1].data >= corpo.conteudo[k].data).to.be.true;",
+                  "});",
+                  "pm.test(\"so os tipos pedidos\", () => corpo.conteudo.forEach(i => pm.expect([\"CONSULTA\", \"RESULTADO_EXAME\"]).to.include(i.tipo)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenPaciente}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historico?tipo=CONSULTA&tipo=RESULTADO_EXAME&inicio=2026-01-01T00:00:00Z",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "historico"
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "CONSULTA"
+                },
+                {
+                  "key": "tipo",
+                  "value": "RESULTADO_EXAME"
+                },
+                {
+                  "key": "inicio",
+                  "value": "2026-01-01T00:00:00Z"
+                }
+              ]
+            },
+            "description": "HU-04/RF-04: tipo e repetivel; inicio e fim sao ISO-8601 inclusivos."
+          }
+        },
+        {
+          "name": "Medico ve historico do paciente que atende",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"pagina com conteudo\", () => pm.expect(corpo.conteudo).to.be.an(\"array\"));",
+                  "pm.test(\"cada item tem tipo, recurso, id, data, titulo e situacao\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.include.all.keys(\"tipo\", \"recurso\", \"id\", \"data\", \"titulo\", \"situacao\");",
+                  "}));",
+                  "pm.test(\"nenhum item carrega conteudo clinico\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.not.have.any.keys(\"laudo\", \"descricao\", \"conteudo\", \"itens\", \"arquivoUrl\");",
+                  "}));",
+                  "pm.test(\"do mais recente para o mais antigo\", () => {",
+                  "  for (let k = 1; k < corpo.conteudo.length; k++) pm.expect(corpo.conteudo[k - 1].data >= corpo.conteudo[k].data).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historico?pacienteId={{pacienteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "historico"
+              ],
+              "query": [
+                {
+                  "key": "pacienteId",
+                  "value": "{{pacienteId}}"
+                }
+              ]
+            },
+            "description": "HU-02/RN-03: o medico tem consulta com este paciente (pasta 9)."
+          }
+        },
+        {
+          "name": "Medico sem pacienteId deve responder 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 Bad Request\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"erro em problem+json\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"problem+json\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historico",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "historico"
+              ],
+              "query": []
+            },
+            "description": "EX-01: MEDICO e ADMINISTRADOR precisam informar o paciente."
+          }
+        },
+        {
+          "name": "Medico consultando paciente que nao atende deve responder 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404 Not Found\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenMedico}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historico?pacienteId=00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "historico"
+              ],
+              "query": [
+                {
+                  "key": "pacienteId",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
+            },
+            "description": "HU-03/EX-02: paciente sem consulta com o medico e tratado como inexistente."
+          }
+        },
+        {
+          "name": "Administrador ve historico de qualquer paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const corpo = pm.response.json();",
+                  "pm.test(\"pagina com conteudo\", () => pm.expect(corpo.conteudo).to.be.an(\"array\"));",
+                  "pm.test(\"cada item tem tipo, recurso, id, data, titulo e situacao\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.include.all.keys(\"tipo\", \"recurso\", \"id\", \"data\", \"titulo\", \"situacao\");",
+                  "}));",
+                  "pm.test(\"nenhum item carrega conteudo clinico\", () => corpo.conteudo.forEach(i => {",
+                  "  pm.expect(i).to.not.have.any.keys(\"laudo\", \"descricao\", \"conteudo\", \"itens\", \"arquivoUrl\");",
+                  "}));",
+                  "pm.test(\"do mais recente para o mais antigo\", () => {",
+                  "  for (let k = 1; k < corpo.conteudo.length; k++) pm.expect(corpo.conteudo[k - 1].data >= corpo.conteudo[k].data).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historico?pacienteId={{pacienteId}}&tamanho=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "historico"
+              ],
+              "query": [
+                {
+                  "key": "pacienteId",
+                  "value": "{{pacienteId}}"
+                },
+                {
+                  "key": "tamanho",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "ADMINISTRADOR informa o pacienteId. Cada item aponta origem (registro relacionado) quando existe."
           }
         }
       ]

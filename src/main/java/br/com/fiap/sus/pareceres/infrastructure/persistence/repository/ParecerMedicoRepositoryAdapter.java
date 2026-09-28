@@ -8,6 +8,7 @@ import br.com.fiap.sus.pareceres.infrastructure.persistence.mapper.ParecerPersis
 import br.com.fiap.sus.shared.domain.PaginaResultado;
 import jakarta.persistence.EntityManager;
 import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
@@ -86,5 +87,10 @@ public class ParecerMedicoRepositoryAdapter implements ParecerMedicoRepository {
                 PageRequest.of(pagina, tamanho, Sort.by("dataParecer").descending().and(Sort.by("id"))));
         return PaginaResultado.de(page.getContent().stream().map(mapper::paraDominio).toList(),
                 pagina, tamanho, page.getTotalElements());
+    }
+
+    @Override
+    public List<ParecerMedico> listarPorPaciente(UUID pacienteId) {
+        return repository.findByPacienteIdOrderByDataParecerDesc(pacienteId).stream().map(mapper::paraDominio).toList();
     }
 }

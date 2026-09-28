@@ -1,0 +1,168 @@
+openapi: 3.0.3
+info:
+  title: Notificacoes - Plataforma Digital de Atendimento SUS
+  version: 1.0.0
+  description: >-
+    Avisos internos ao usuario autenticado sobre fatos do seu atendimento. Toda rota opera
+    sobre as notificacoes do proprio usuario do token; notificacao de terceiro responde 404.
+    A mensagem nunca contem dado clinico.
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/notificacoes:
+    get:
+      operationId: listarMinhasNotificacoes
+      summary: Lista as notificacoes do usuario autenticado, da mais recente para a mais antiga
+      parameters:
+        - name: lida
+          in: query
+          description: Filtra por situacao de leitura; omitido devolve todas
+          schema: {type: boolean}
+        - {name: pagina, in: query, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: tamanho, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+      responses:
+        '200':
+          description: Pagina de notificacoes do usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaNotificacoes'
+        '400': {$ref: '#/components/responses/EntradaInvalida'}
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+  /api/v1/notificacoes/nao-lidas/contagem:
+    get:
+      operationId: contarNaoLidas
+      summary: Quantidade de notificacoes nao lidas do usuario autenticado
+      responses:
+        '200':
+          description: Contagem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContagemNaoLidasResponse'
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+  /api/v1/notificacoes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+    get:
+      operationId: consultarMinhaNotificacao
+      summary: Detalhe de uma notificacao do usuario autenticado
+      responses:
+        '200':
+          description: Notificacao
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificacaoResponse'
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+  /api/v1/notificacoes/{id}/leitura:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+    patch:
+      operationId: marcarNotificacaoComoLida
+      summary: Marca a notificacao como lida (irreversivel e idempotente)
+      description: Se ja estiver lida, devolve 200 sem alterar a data de leitura.
+      responses:
+        '200':
+          description: Notificacao apos a marcacao
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificacaoResponse'
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    TipoNotificacao:
+      type: string
+      enum:
+        - CONSULTA_AGENDADA
+        - CONSULTA_REMARCADA
+        - CONSULTA_CANCELADA
+        - EXAME_SOLICITADO
+        - EXAME_AGENDADO
+        - RESULTADO_DISPONIVEL
+        - PARECER_CRIADO
+        - RECEITA_EMITIDA
+        - RECEITA_RENOVADA
+        - DOCUMENTO_EMITIDO
+    NotificacaoResponse:
+      type: object
+      required: [id, tipo, titulo, mensagem, recurso, lida, criadoEm]
+      properties:
+        id: {type: string, format: uuid}
+        tipo: {$ref: '#/components/schemas/TipoNotificacao'}
+        titulo: {type: string, maxLength: 150, example: Consulta agendada}
+        mensagem: {type: string, maxLength: 500, example: Sua consulta foi agendada para 30/09/2026 14:00.}
+        referenciaId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Identificador do registro de origem (consulta, exame, resultado, parecer, receita ou documento)
+        recurso:
+          type: string
+          description: Recurso da API onde o registro de origem pode ser consultado
+          example: consultas
+        lida: {type: boolean}
+        dataLeitura: {type: string, format: date-time, nullable: true}
+        criadoEm: {type: string, format: date-time}
+    ContagemNaoLidasResponse:
+      type: object
+      required: [quantidade]
+      properties:
+        quantidade: {type: integer, format: int64, minimum: 0, example: 3}
+    PaginaNotificacoes:
+      type: object
+      required: [conteudo, pagina, tamanho, totalElementos, totalPaginas]
+      properties:
+        conteudo:
+          type: array
+          items: {$ref: '#/components/schemas/NotificacaoResponse'}
+        pagina: {type: integer}
+        tamanho: {type: integer}
+        totalElementos: {type: integer, format: int64}
+        totalPaginas: {type: integer}
+    Problema:
+      type: object
+      description: RFC 7807
+      properties:
+        type: {type: string}
+        title: {type: string}
+        status: {type: integer}
+        detail: {type: string}
+        instance: {type: string}
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              campo: {type: string}
+              mensagem: {type: string}
+  responses:
+    EntradaInvalida:
+      description: Parametro invalido
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    NaoAutenticado:
+      description: Token ausente ou invalido
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    NaoEncontrado:
+      description: Notificacao inexistente ou pertencente a outro usuario
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}

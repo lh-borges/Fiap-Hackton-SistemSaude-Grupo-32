@@ -1,6 +1,7 @@
 package br.com.fiap.sus.pareceres.infrastructure.persistence.repository;
 
 import br.com.fiap.sus.pareceres.infrastructure.persistence.entity.ParecerMedicoEntity;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -18,4 +19,6 @@ public interface ParecerMedicoJpaRepository
     Optional<ParecerMedicoEntity> findById(UUID id);
 
     boolean existsByResultadoExameId(UUID resultadoExameId);
+
+    List<ParecerMedicoEntity> findByPacienteIdOrderByDataParecerDesc(UUID pacienteId);
 }

@@ -57,10 +57,10 @@ qualquer repositório e a extração futura fica inviável.
 | `exames` | `br.com.fiap.sus.exames` | Solicitação e realização de exame | Thiago |
 | `resultados` | `br.com.fiap.sus.resultados` | Resultado de imagem e laboratorial + itens | Thiago |
 | `pareceres` | `br.com.fiap.sus.pareceres` | Parecer médico sobre resultado | Juliana |
-| `receitas` | `br.com.fiap.sus.resultados` | Receita e itens de receita | Thiago |
+| `receitas` | `br.com.fiap.sus.receitas` | Receita e itens de receita | Thiago |
 | `documentos` | `br.com.fiap.sus.documentos` | Documento médico | Juliana |
 | `notificacoes` | `br.com.fiap.sus.notificacoes` | Notificação ao usuário, consumidor de eventos | Danilo |
-| `historico` | `br.com.fiap.sus.historico` | Linha do tempo derivada (somente leitura, sem tabela) | Thiago |
+| `historico` | `br.com.fiap.sus.historico` | Linha do tempo derivada (somente leitura, sem tabela) | Danilo (previsto: Thiago) |
 
 ### Grafo de dependências permitidas
 
@@ -75,7 +75,7 @@ resultados → shared, exames
 pareceres  → shared, resultados, cadastros
 receitas   → shared, cadastros, consultas
 documentos → shared, cadastros, consultas
-historico  → shared + portas de leitura dos módulos clínicos
+historico  → shared, cadastros, consultas, exames, resultados, pareceres, receitas, documentos (só `api`)
 notificacoes → shared          (só reage a eventos; não é chamado por ninguém)
 ```
 
@@ -265,7 +265,8 @@ notificações são geradas pelo listener local do Modulith.
 ```
 
 `009-notificacoes` pode ser desenvolvido em paralelo desde o início, contra os contratos
-de evento definidos em `./events.md`.
+de evento definidos em `./events.md`. `010-historico` vem por último: depende das portas de
+leitura por paciente de `002` a `008`.
 
 ## 13. Complexity Tracking
 

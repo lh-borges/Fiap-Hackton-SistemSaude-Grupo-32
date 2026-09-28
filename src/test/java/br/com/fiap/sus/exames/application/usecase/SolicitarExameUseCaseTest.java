@@ -1,10 +1,12 @@
 package br.com.fiap.sus.exames.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.exames.application.event.ExameSolicitadoEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.exames.application.dto.SolicitacaoExameOutput;
 import br.com.fiap.sus.exames.application.dto.SolicitarExameDTO;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +39,11 @@ class SolicitarExameUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private SolicitarExameUseCase useCase;
 
     private final UUID pacienteId = UUID.randomUUID();
@@ -46,7 +54,7 @@ class SolicitarExameUseCaseTest {
     @BeforeEach
     void configurar() {
         useCase = new SolicitarExameUseCase(solicitacaoExameRepository, cadastroQuery,
-                usuarioAutenticadoProvider);
+                usuarioAutenticadoProvider, eventPublisher);
     }
 
     private SolicitarExameDTO dtoValido() {
@@ -67,6 +75,7 @@ class SolicitarExameUseCaseTest {
 
         assertThat(resultado.medicoId()).isEqualTo(medicoId);
         assertThat(resultado.situacao()).isEqualTo(SituacaoSolicitacaoExame.PENDENTE);
+        verify(eventPublisher).publishEvent(any(ExameSolicitadoEvent.class));
     }
 
     @Test

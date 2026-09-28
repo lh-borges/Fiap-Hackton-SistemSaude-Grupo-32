@@ -61,8 +61,7 @@ public class RegistrarParecerUseCase {
         ParecerMedico parecer = ParecerMedico.emitir(dto.resultadoExameId(), pacienteId, medicoId, dto.descricao());
         ParecerMedico salvo = parecerMedicoRepository.salvar(parecer, usuario.id());
 
-        eventPublisher.publishEvent(new ParecerCriadoEvent(salvo.getId(), salvo.getResultadoExameId(),
-                salvo.getPacienteId(), salvo.getMedicoId(), salvo.getDataParecer()));
+        eventPublisher.publishEvent(ParecerCriadoEvent.de(salvo));
 
         return ParecerMedicoOutput.of(salvo, medico.especialidadeId(), medico.crm(), usuario.nome());
     }

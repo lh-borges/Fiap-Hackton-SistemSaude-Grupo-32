@@ -1,10 +1,12 @@
 package br.com.fiap.sus.consultas.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.consultas.application.event.ConsultaRemarcadaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.consultas.application.dto.ConsultaOutput;
 import br.com.fiap.sus.consultas.application.dto.RemarcarConsultaDTO;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +42,11 @@ class RemarcarConsultaUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private RemarcarConsultaUseCase useCase;
 
     private final UUID pacienteId = UUID.randomUUID();
@@ -46,7 +54,7 @@ class RemarcarConsultaUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new RemarcarConsultaUseCase(consultaRepository, cadastroQuery, usuarioAutenticadoProvider);
+        useCase = new RemarcarConsultaUseCase(consultaRepository, cadastroQuery, usuarioAutenticadoProvider, eventPublisher);
     }
 
     private Consulta consultaAgendada() {
@@ -68,6 +76,7 @@ class RemarcarConsultaUseCaseTest {
                 new RemarcarConsultaDTO(consultaId, Instant.now().plus(5, ChronoUnit.DAYS)));
 
         assertThat(resultado.remarcada()).isTrue();
+        verify(eventPublisher).publishEvent(any(ConsultaRemarcadaEvent.class));
     }
 
     @Test

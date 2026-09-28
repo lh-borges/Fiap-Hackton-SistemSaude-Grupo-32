@@ -2,6 +2,7 @@ package br.com.fiap.sus.resultados.domain.repository;
 
 import br.com.fiap.sus.resultados.domain.model.ResultadoExame;
 import br.com.fiap.sus.shared.domain.PaginaResultado;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,4 +19,7 @@ public interface ResultadoExameRepository {
 
     /** RF-07: listagem por paciente e periodo, restrita ao titular no controller. */
     PaginaResultado<ResultadoExame> listar(ResultadoExameFiltro filtro, int pagina, int tamanho);
+
+    /** Feature 010: todos os resultados do paciente, do mais recente para o mais antigo. */
+    List<ResultadoExame> listarPorPaciente(UUID pacienteId);
 }

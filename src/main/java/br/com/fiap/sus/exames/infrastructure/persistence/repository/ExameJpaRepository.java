@@ -2,6 +2,8 @@ package br.com.fiap.sus.exames.infrastructure.persistence.repository;
 
 import br.com.fiap.sus.exames.domain.enums.SituacaoExame;
 import br.com.fiap.sus.exames.infrastructure.persistence.entity.ExameEntity;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +15,6 @@ public interface ExameJpaRepository
     Optional<ExameEntity> findBySolicitacaoExameId(UUID solicitacaoExameId);
 
     boolean existsBySolicitacaoExameIdAndSituacaoNot(UUID solicitacaoExameId, SituacaoExame situacaoExcluida);
+
+    List<ExameEntity> findBySolicitacaoExameIdIn(Collection<UUID> solicitacaoExameIds);
 }

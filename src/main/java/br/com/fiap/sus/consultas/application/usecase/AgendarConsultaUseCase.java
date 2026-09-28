@@ -3,33 +3,40 @@ package br.com.fiap.sus.consultas.application.usecase;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.consultas.application.dto.AgendarConsultaDTO;
 import br.com.fiap.sus.consultas.application.dto.ConsultaOutput;
+import br.com.fiap.sus.consultas.application.event.ConsultaAgendadaEvent;
 import br.com.fiap.sus.consultas.domain.model.Consulta;
 import br.com.fiap.sus.consultas.domain.repository.ConsultaRepository;
 import br.com.fiap.sus.shared.domain.exception.NaoAutorizadoException;
 import br.com.fiap.sus.shared.domain.exception.RecursoNaoEncontradoException;
 import br.com.fiap.sus.shared.infrastructure.security.UsuarioAutenticado;
 import br.com.fiap.sus.shared.infrastructure.security.UsuarioAutenticadoProvider;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-/** HU-01/RF-01/RN-01/RN-02: agenda consulta. PACIENTE so agenda para si mesmo. */
+/** HU-01/RF-01/RN-01/RN-02: agenda consulta. PACIENTE so agenda para si mesmo. Publica ConsultaAgendadaEvent. */
 @Component
 public class AgendarConsultaUseCase {
 
     private final ConsultaRepository consultaRepository;
     private final CadastroQuery cadastroQuery;
     private final UsuarioAutenticadoProvider usuarioAutenticadoProvider;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AgendarConsultaUseCase(ConsultaRepository consultaRepository, CadastroQuery cadastroQuery,
-                                  UsuarioAutenticadoProvider usuarioAutenticadoProvider) {
+                                  UsuarioAutenticadoProvider usuarioAutenticadoProvider,
+                                  ApplicationEventPublisher eventPublisher) {
         this.consultaRepository = consultaRepository;
         this.cadastroQuery = cadastroQuery;
         this.usuarioAutenticadoProvider = usuarioAutenticadoProvider;
+        this.eventPublisher = eventPublisher;
     }
 
     @PreAuthorize("hasAnyRole('ATENDENTE', 'PACIENTE', 'ADMINISTRADOR')")
+    @Transactional
     public ConsultaOutput executar(AgendarConsultaDTO dto) {
         UsuarioAutenticado usuario = usuarioAutenticadoProvider.obrigatorio();
 
@@ -54,6 +61,8 @@ public class AgendarConsultaUseCase {
 
         Consulta consulta = Consulta.agendar(dto.pacienteId(), dto.medicoId(), dto.unidadeSaudeId(),
                 dto.dataHora(), dto.motivo());
-        return ConsultaOutput.de(consultaRepository.salvar(consulta));
+        Consulta salva = consultaRepository.salvar(consulta);
+        eventPublisher.publishEvent(ConsultaAgendadaEvent.de(salva));
+        return ConsultaOutput.de(salva);
     }
 }

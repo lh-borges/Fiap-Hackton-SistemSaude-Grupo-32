@@ -20,3 +20,6 @@ Thumbs.db
 .env.local
 *.log
 logs/
+
+# Estado local do plugin oh-my-claudecode
+.omc/

@@ -21,10 +21,12 @@ histórico e rastreabilidade.
 | `exames` · `resultados` | [004](specs/004-exames/spec.md) · [005](specs/005-resultados/spec.md) | ✅ implementado (Thiago) |
 | `pareceres` · `documentos` | [006](specs/006-pareceres/spec.md) · [008](specs/008-documentos/spec.md) | ✅ implementado (Juliana) |
 | `receitas` | [007](specs/007-receitas/spec.md) | ✅ implementado (Thiago) |
-| `notificacoes` | [009](specs/009-notificacoes/spec.md) | 📄 especificado (Danilo) |
+| `notificacoes` | [009](specs/009-notificacoes/spec.md) | ✅ implementado (Danilo) — eventos de domínio + Kafka |
+| `historico` | [010](specs/010-historico/spec.md) | ✅ implementado (Danilo) — linha do tempo derivada, sem tabela |
 
-Build: **313 testes passando** (`mvn verify -Pquality`), incluindo verificação de fronteiras do
-Spring Modulith, regra de dependência com ArchUnit e gate de cobertura de 80%.
+Build: **422 testes passando** (`mvn verify -Pquality`), incluindo verificação de fronteiras do
+Spring Modulith, regra de dependência com ArchUnit, teste de módulo com eventos e gate de
+cobertura de 80%.
 
 ## Como rodar
 
@@ -219,9 +221,62 @@ Ao copiar uma chamada como `curl`, substitua variáveis como `{{pacienteId}}`,
 Se o backend receber `{{pacienteId}}` literalmente, ele responde `400` porque esse texto
 não pode ser convertido para `UUID`.
 
-A pasta **13. Testes de segurança** é executável e demonstra o controle de acesso:
+A pasta **14. Notificações** lista, conta e marca como lidas as notificações geradas pelas pastas
+anteriores (consulta agendada, exame solicitado, resultado, parecer, documento), para o paciente
+e para o médico.
+
+A pasta **15. Testes de segurança** é executável e demonstra o controle de acesso:
 `401` sem token, `403` por perfil insuficiente e `404` quando um paciente tenta ler o
 cadastro de outro.
+
+A pasta **16. Histórico do paciente** monta a linha do tempo a partir de tudo o que as pastas
+anteriores criaram, como paciente, como médico e como administrador, e mostra os erros de
+acesso (`400` sem `pacienteId`, `404` para paciente que o médico não atende).
+
+## Mensageria e notificações
+
+Cada caso de uso clínico publica um **evento de domínio** dentro da própria transação
+(`ConsultaAgendadaEvent`, `ResultadoExameDisponivelEvent`, `ReceitaEmitidaEvent`…). O Spring
+Modulith grava a publicação na tabela `event_publication` e, após o commit, entrega o evento ao
+módulo `notificacoes`, que cria uma notificação por destinatário (paciente e, quando faz
+sentido, médico), deduplicada pelo `eventoId`. A mensagem nunca carrega dado clínico.
+
+Com `MESSAGING_ENABLED=true` (padrão no Compose) o mesmo evento é **externalizado para o
+Kafka** no tópico `sus.<modulo>.<evento>.v1`, com o `pacienteId` como chave. Sem Kafka
+(`MESSAGING_ENABLED=false`, padrão no perfil `local`) a aplicação sobe, o fluxo clínico
+funciona e as notificações continuam sendo geradas; só a externalização é desligada.
+
+Para observar os eventos chegando ao broker:
+
+```bash
+docker compose exec kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic sus.consultas.agendada.v1 --from-beginning --property print.key=true
+```
+
+Catálogo completo em [`specs/000-plataforma-sus/events.md`](specs/000-plataforma-sus/events.md)
+e guia de demonstração em [`docs/mensageria-e-notificacoes.md`](docs/mensageria-e-notificacoes.md).
+
+## Histórico do paciente
+
+`GET /api/v1/historico` devolve a **linha do tempo** do atendimento: consultas, solicitações de
+exame, exames, resultados, pareceres, receitas e documentos em uma única lista, do registro mais
+recente para o mais antigo, com filtro por `tipo` (repetível) e por período (`inicio`, `fim`).
+Não existe tabela de histórico: o módulo `historico` lê, em tempo de requisição, a porta `api`
+de cada módulo clínico e ordena em memória. Cada item traz `tipo`, `recurso`, `id`, `data`,
+`titulo`, `situacao`, `medicoId` e `origem` (o registro relacionado), nunca o conteúdo clínico;
+o detalhe é lido na rota do módulo dono, com a regra de acesso daquele módulo.
+
+| Perfil | O que vê |
+|---|---|
+| `PACIENTE` | O próprio histórico; `pacienteId` da requisição é ignorado |
+| `MEDICO` | Pacientes com quem tem consulta não cancelada (`pacienteId` obrigatório); outro paciente responde `404` |
+| `ADMINISTRADOR` | Qualquer paciente existente (`pacienteId` obrigatório) |
+| `ATENDENTE` | Não acessa (`403`) |
+
+```bash
+curl -s http://localhost:8080/api/v1/historico?tipo=CONSULTA&tipo=RESULTADO_EXAME -H "Authorization: Bearer <token do paciente>"
+```
+
+Spec, plano e contrato em [`specs/010-historico/`](specs/010-historico/).
 
 ## Arquitetura
 
@@ -259,7 +314,7 @@ Stack: Java 21 · Spring Boot 3.5 · Spring Security (JWT) · Spring Data JPA ·
 
 ```bash
 mvn verify              # compila, roda os testes, valida fronteiras de módulo
-mvn verify -Pquality    # roda a suíte e exige cobertura de linhas mínima de 80% (atual: 80,41%)
+mvn verify -Pquality    # roda a suíte e exige cobertura de linhas mínima de 80% (atual: 80,4%)
 ```
 
 Fluxo de trabalho (Spec-Driven Development):
@@ -275,5 +330,4 @@ Nenhum código de produção antes da spec aprovada. Detalhes em
 
 - O gate de cobertura de 80% já passa no profile `quality`; manter novos módulos cobertos para não
   regredir esse número.
-- Kafka sobe no Compose mas ainda não é usado: entra com a feature `009-notificacoes`.
-- Pendências `[NEEDS CLARIFICATION]` das features `003` a `009` continuam abertas.
+- Pendências `[NEEDS CLARIFICATION]` das features `003` a `008` continuam abertas na spec-mãe.

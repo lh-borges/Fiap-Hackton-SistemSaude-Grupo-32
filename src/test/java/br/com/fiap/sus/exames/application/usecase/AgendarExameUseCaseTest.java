@@ -1,10 +1,12 @@
 package br.com.fiap.sus.exames.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.exames.application.event.ExameAgendadoEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.exames.application.dto.AgendarExameDTO;
 import br.com.fiap.sus.exames.application.dto.ExameOutput;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +42,11 @@ class AgendarExameUseCaseTest {
     @Mock
     private CadastroQuery cadastroQuery;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private AgendarExameUseCase useCase;
 
     private final UUID solicitacaoExameId = UUID.randomUUID();
@@ -46,7 +54,7 @@ class AgendarExameUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new AgendarExameUseCase(solicitacaoExameRepository, exameRepository, cadastroQuery);
+        useCase = new AgendarExameUseCase(solicitacaoExameRepository, exameRepository, cadastroQuery, eventPublisher);
     }
 
     private SolicitacaoExame solicitacaoPendente() {
@@ -71,6 +79,7 @@ class AgendarExameUseCaseTest {
 
         assertThat(resultado.situacao()).isEqualTo(SituacaoExame.AGENDADO);
         assertThat(resultado.unidadeSaudeId()).isEqualTo(unidadeSaudeId);
+        verify(eventPublisher).publishEvent(any(ExameAgendadoEvent.class));
     }
 
     @Test

@@ -1,10 +1,12 @@
 package br.com.fiap.sus.resultados.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.resultados.application.event.ResultadoExameDisponivelEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.exames.api.ExameQuery;
 import br.com.fiap.sus.resultados.application.dto.ItemResultadoLaboratorialDTO;
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +40,11 @@ class RegistrarResultadoLaboratorialUseCaseTest {
     @Mock
     private CadastroQuery cadastroQuery;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private RegistrarResultadoLaboratorialUseCase useCase;
 
     private final UUID exameId = UUID.randomUUID();
@@ -45,7 +53,7 @@ class RegistrarResultadoLaboratorialUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new RegistrarResultadoLaboratorialUseCase(resultadoExameRepository, exameQuery, cadastroQuery);
+        useCase = new RegistrarResultadoLaboratorialUseCase(resultadoExameRepository, exameQuery, cadastroQuery, eventPublisher);
     }
 
     private RegistrarResultadoLaboratorialDTO dtoValido() {
@@ -67,6 +75,7 @@ class RegistrarResultadoLaboratorialUseCaseTest {
 
         assertThat(resultado.tipoResultado()).isEqualTo(TipoResultado.LABORATORIAL);
         assertThat(resultado.itens()).hasSize(1);
+        verify(eventPublisher).publishEvent(any(ResultadoExameDisponivelEvent.class));
     }
 
     @Test

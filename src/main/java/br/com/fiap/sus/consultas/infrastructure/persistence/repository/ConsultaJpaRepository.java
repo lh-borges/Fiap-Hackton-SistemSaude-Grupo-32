@@ -2,6 +2,7 @@ package br.com.fiap.sus.consultas.infrastructure.persistence.repository;
 
 import br.com.fiap.sus.consultas.infrastructure.persistence.entity.ConsultaEntity;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.Set;
@@ -21,4 +22,6 @@ public interface ConsultaJpaRepository
 
     @Query("select c.dataHora from ConsultaEntity c where c.id = :consultaId")
     Optional<Instant> dataHoraDaConsulta(@Param("consultaId") UUID consultaId);
+
+    List<ConsultaEntity> findByPacienteIdOrderByDataHoraDesc(UUID pacienteId);
 }

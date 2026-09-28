@@ -1,10 +1,12 @@
 package br.com.fiap.sus.receitas.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.receitas.application.event.ReceitaEmitidaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.receitas.application.dto.EmitirReceitaDTO;
 import br.com.fiap.sus.receitas.application.dto.ItemReceitaDTO;
@@ -26,6 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +43,11 @@ class EmitirReceitaUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private EmitirReceitaUseCase useCase;
 
     private final UUID pacienteId = UUID.randomUUID();
@@ -48,7 +56,7 @@ class EmitirReceitaUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new EmitirReceitaUseCase(receitaRepository, cadastroQuery, usuarioAutenticadoProvider);
+        useCase = new EmitirReceitaUseCase(receitaRepository, cadastroQuery, usuarioAutenticadoProvider, eventPublisher);
     }
 
     private EmitirReceitaDTO dtoValido() {
@@ -72,6 +80,7 @@ class EmitirReceitaUseCaseTest {
         assertThat(resultado.medicoId()).isEqualTo(medicoId);
         assertThat(resultado.situacao()).isEqualTo(SituacaoReceita.ATIVA);
         assertThat(resultado.itens()).hasSize(1);
+        verify(eventPublisher).publishEvent(any(ReceitaEmitidaEvent.class));
     }
 
     @Test

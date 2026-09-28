@@ -1,10 +1,12 @@
 package br.com.fiap.sus.receitas.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.receitas.application.event.ReceitaRenovadaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.receitas.application.dto.ReceitaOutput;
 import br.com.fiap.sus.receitas.application.dto.RenovarReceitaDTO;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +44,11 @@ class RenovarReceitaUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private RenovarReceitaUseCase useCase;
 
     private final UUID pacienteId = UUID.randomUUID();
@@ -52,7 +60,7 @@ class RenovarReceitaUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new RenovarReceitaUseCase(receitaRepository, cadastroQuery, usuarioAutenticadoProvider);
+        useCase = new RenovarReceitaUseCase(receitaRepository, cadastroQuery, usuarioAutenticadoProvider, eventPublisher);
     }
 
     /** Programa o medico autenticado (chamado antes de tudo dentro do usecase). */
@@ -81,6 +89,7 @@ class RenovarReceitaUseCaseTest {
 
         assertThat(resultado.situacao()).isEqualTo(SituacaoReceita.ATIVA);
         assertThat(resultado.receitaOrigemId()).isEqualTo(receitaOrigemId);
+        verify(eventPublisher).publishEvent(any(ReceitaRenovadaEvent.class));
     }
 
     @Test

@@ -16,6 +16,7 @@ import br.com.fiap.sus.shared.infrastructure.security.UsuarioAutenticadoProvider
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -46,6 +47,7 @@ public class EmitirDocumentoUseCase {
     }
 
     @PreAuthorize("hasRole('MEDICO')")
+    @Transactional
     public DocumentoMedicoOutput executar(EmitirDocumentoDTO dto) {
         UsuarioAutenticado usuario = usuarioAutenticadoProvider.obrigatorio();
         UUID medicoId = cadastroQuery.medicoIdDoUsuario(usuario.id())
@@ -80,8 +82,7 @@ public class EmitirDocumentoUseCase {
                 dto.consultaId(), dto.exameId());
         DocumentoMedico salvo = documentoMedicoRepository.salvar(documento);
 
-        eventPublisher.publishEvent(new DocumentoEmitidoEvent(salvo.getId(), salvo.getPacienteId(),
-                salvo.getMedicoId(), salvo.getTipo(), salvo.getDataEmissao()));
+        eventPublisher.publishEvent(DocumentoEmitidoEvent.de(salvo));
 
         return DocumentoMedicoOutput.deDetalhe(salvo);
     }

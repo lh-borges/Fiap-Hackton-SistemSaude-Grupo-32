@@ -7,6 +7,7 @@ import br.com.fiap.sus.documentos.infrastructure.persistence.entity.DocumentoMed
 import br.com.fiap.sus.documentos.infrastructure.persistence.mapper.DocumentoPersistenceMapper;
 import br.com.fiap.sus.shared.domain.PaginaResultado;
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -72,5 +73,10 @@ public class DocumentoMedicoRepositoryAdapter implements DocumentoMedicoReposito
                 PageRequest.of(pagina, tamanho, Sort.by("dataEmissao").descending().and(Sort.by("id"))));
         return PaginaResultado.de(page.getContent().stream().map(mapper::paraDominio).toList(),
                 pagina, tamanho, page.getTotalElements());
+    }
+
+    @Override
+    public List<DocumentoMedico> listarPorPaciente(UUID pacienteId) {
+        return repository.findByPacienteIdOrderByDataEmissaoDesc(pacienteId).stream().map(mapper::paraDominio).toList();
     }
 }

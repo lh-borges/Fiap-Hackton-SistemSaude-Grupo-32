@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * Tratamento unico de erro no formato RFC 7807 (Artigo VIII.2).
@@ -86,6 +87,13 @@ public class ApiExceptionHandler {
         log.warn("Violacao de integridade em {} {}", req.getMethod(), req.getRequestURI());
         return problema(HttpStatus.CONFLICT, "Conflito de dados",
                 "A operacao viola uma restricao de unicidade ou de relacionamento.", "conflito", req);
+    }
+
+    /** Rota ou recurso estatico inexistente (ex.: URL digitada errada) e 404, nao erro interno. */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail tratarRotaInexistente(NoResourceFoundException ex, HttpServletRequest req) {
+        return problema(HttpStatus.NOT_FOUND, "Recurso nao encontrado",
+                "Nao existe recurso neste endereco.", "nao-encontrado", req);
     }
 
     @ExceptionHandler(Exception.class)

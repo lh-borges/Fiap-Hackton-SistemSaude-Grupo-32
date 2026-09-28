@@ -1,3 +1,9 @@
 spring:
   jpa:
     show-sql: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+  modulith:
+    events:
+      externalization:
+        enabled: ${MESSAGING_ENABLED:true}

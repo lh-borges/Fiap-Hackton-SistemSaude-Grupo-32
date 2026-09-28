@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.consultas.application.event.ConsultaAgendadaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.consultas.application.dto.AgendarConsultaDTO;
 import br.com.fiap.sus.consultas.application.dto.ConsultaOutput;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +41,11 @@ class AgendarConsultaUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private AgendarConsultaUseCase useCase;
 
     private final UUID pacienteId = UUID.randomUUID();
@@ -47,7 +54,7 @@ class AgendarConsultaUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new AgendarConsultaUseCase(consultaRepository, cadastroQuery, usuarioAutenticadoProvider);
+        useCase = new AgendarConsultaUseCase(consultaRepository, cadastroQuery, usuarioAutenticadoProvider, eventPublisher);
     }
 
     private AgendarConsultaDTO dtoValido() {
@@ -69,6 +76,7 @@ class AgendarConsultaUseCaseTest {
 
         assertThat(resultado.pacienteId()).isEqualTo(pacienteId);
         verify(consultaRepository).salvar(any(Consulta.class));
+        verify(eventPublisher).publishEvent(any(ConsultaAgendadaEvent.class));
     }
 
     @Test

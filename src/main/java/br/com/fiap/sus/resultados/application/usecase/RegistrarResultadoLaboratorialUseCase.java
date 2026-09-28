@@ -5,6 +5,7 @@ import br.com.fiap.sus.exames.api.ExameQuery;
 import br.com.fiap.sus.resultados.application.dto.ItemResultadoLaboratorialDTO;
 import br.com.fiap.sus.resultados.application.dto.RegistrarResultadoLaboratorialDTO;
 import br.com.fiap.sus.resultados.application.dto.ResultadoExameOutput;
+import br.com.fiap.sus.resultados.application.event.ResultadoExameDisponivelEvent;
 import br.com.fiap.sus.resultados.domain.enums.SituacaoParametro;
 import br.com.fiap.sus.resultados.domain.model.ItemResultadoLaboratorial;
 import br.com.fiap.sus.resultados.domain.model.ResultadoExame;
@@ -14,25 +15,31 @@ import br.com.fiap.sus.shared.domain.exception.RecursoNaoEncontradoException;
 import br.com.fiap.sus.shared.domain.exception.RegraDeNegocioException;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-/** HU-02/RF-02/RF-03/RN-01/RN-02/RN-03/RN-05/RN-06/RN-07: ATENDENTE/ADMINISTRADOR registram. */
+/** HU-02/RF-02/RF-03/RN-01/RN-02/RN-03/RN-05/RN-06/RN-07: ATENDENTE/ADMINISTRADOR registram. Publica ResultadoExameDisponivelEvent. */
 @Component
 public class RegistrarResultadoLaboratorialUseCase {
 
     private final ResultadoExameRepository resultadoExameRepository;
     private final ExameQuery exameQuery;
     private final CadastroQuery cadastroQuery;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RegistrarResultadoLaboratorialUseCase(ResultadoExameRepository resultadoExameRepository,
-                                                 ExameQuery exameQuery, CadastroQuery cadastroQuery) {
+                                                 ExameQuery exameQuery, CadastroQuery cadastroQuery,
+                                                 ApplicationEventPublisher eventPublisher) {
         this.resultadoExameRepository = resultadoExameRepository;
         this.exameQuery = exameQuery;
         this.cadastroQuery = cadastroQuery;
+        this.eventPublisher = eventPublisher;
     }
 
     @PreAuthorize("hasAnyRole('ATENDENTE', 'ADMINISTRADOR')")
+    @Transactional
     public ResultadoExameOutput executar(RegistrarResultadoLaboratorialDTO dto) {
         if (!exameQuery.exameRealizadoExiste(dto.exameId())) {
             throw new RegraDeNegocioException("Resultado so pode ser registrado para exame realizado.");
@@ -53,7 +60,10 @@ public class RegistrarResultadoLaboratorialUseCase {
         ResultadoExame resultado = ResultadoExame.criarLaboratorial(dto.exameId(), dto.pacienteId(), itens,
                 dto.observacao());
 
-        return ResultadoExameOutput.de(resultadoExameRepository.salvar(resultado));
+        ResultadoExame salvo = resultadoExameRepository.salvar(resultado);
+        eventPublisher.publishEvent(ResultadoExameDisponivelEvent.de(salvo,
+                exameQuery.medicoSolicitanteIdDoExame(salvo.getExameId()).orElse(null)));
+        return ResultadoExameOutput.de(salvo);
     }
 
     private ItemResultadoLaboratorial converter(ItemResultadoLaboratorialDTO item) {

@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: Historico do paciente - Plataforma Digital de Atendimento SUS
+  version: 1.0.0
+  description: >-
+    Linha do tempo do atendimento de um paciente, derivada em tempo de leitura de consultas,
+    solicitacoes de exame, exames, resultados, pareceres, receitas e documentos. Nenhum dado
+    e persistido. O item nao carrega conteudo clinico: aponta o recurso e o id do registro de
+    origem para consulta na rota do modulo dono.
+security:
+  - bearerAuth: []
+paths:
+  /api/v1/historico:
+    get:
+      operationId: consultarHistorico
+      summary: Linha do tempo do paciente, do registro mais recente para o mais antigo
+      description: >-
+        PACIENTE ve o proprio historico e o parametro pacienteId e ignorado. MEDICO informa o
+        pacienteId e so enxerga pacientes com quem tem consulta nao cancelada. ADMINISTRADOR
+        informa o pacienteId de qualquer paciente. ATENDENTE nao acessa.
+      parameters:
+        - name: pacienteId
+          in: query
+          description: Obrigatorio para MEDICO e ADMINISTRADOR; ignorado para PACIENTE
+          schema: {type: string, format: uuid}
+        - name: tipo
+          in: query
+          description: Um ou mais tipos de registro; omitido devolve todos
+          style: form
+          explode: true
+          schema:
+            type: array
+            items: {$ref: '#/components/schemas/TipoRegistro'}
+        - name: inicio
+          in: query
+          description: Data-hora inicial do periodo (inclusiva)
+          schema: {type: string, format: date-time}
+        - name: fim
+          in: query
+          description: Data-hora final do periodo (inclusiva); deve ser igual ou posterior a inicio
+          schema: {type: string, format: date-time}
+        - {name: pagina, in: query, schema: {type: integer, minimum: 0, default: 0}}
+        - {name: tamanho, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+      responses:
+        '200':
+          description: Pagina da linha do tempo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaHistorico'
+        '400': {$ref: '#/components/responses/EntradaInvalida'}
+        '401': {$ref: '#/components/responses/NaoAutenticado'}
+        '403': {$ref: '#/components/responses/PerfilSemAcesso'}
+        '404': {$ref: '#/components/responses/NaoEncontrado'}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    TipoRegistro:
+      type: string
+      description: Tipo do registro de origem, na ordem natural do atendimento
+      enum:
+        - CONSULTA
+        - SOLICITACAO_EXAME
+        - EXAME
+        - RESULTADO_EXAME
+        - PARECER
+        - RECEITA
+        - DOCUMENTO
+    ReferenciaResponse:
+      type: object
+      description: Registro relacionado ao item (exame da solicitacao, resultado do parecer, receita de origem da renovacao, consulta ou exame do documento)
+      required: [tipo, recurso, id]
+      properties:
+        tipo: {$ref: '#/components/schemas/TipoRegistro'}
+        recurso: {type: string, example: resultados-exame}
+        id: {type: string, format: uuid}
+    RegistroHistoricoResponse:
+      type: object
+      required: [tipo, id, recurso, data, titulo, situacao]
+      properties:
+        tipo: {$ref: '#/components/schemas/TipoRegistro'}
+        id:
+          type: string
+          format: uuid
+          description: Identificador do registro no modulo dono
+        recurso:
+          type: string
+          description: Recurso da API onde o detalhe do registro e consultado
+          example: consultas
+        data:
+          type: string
+          format: date-time
+          description: Data do ato (horario da consulta, realizacao do exame, emissao do documento...)
+        titulo: {type: string, maxLength: 150, example: Consulta realizada}
+        situacao: {type: string, example: REALIZADA}
+        medicoId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Medico responsavel pelo ato, quando houver
+        origem:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/ReferenciaResponse'
+    PaginaHistorico:
+      type: object
+      required: [conteudo, pagina, tamanho, totalElementos, totalPaginas]
+      properties:
+        conteudo:
+          type: array
+          items: {$ref: '#/components/schemas/RegistroHistoricoResponse'}
+        pagina: {type: integer}
+        tamanho: {type: integer}
+        totalElementos: {type: integer, format: int64}
+        totalPaginas: {type: integer}
+    Problema:
+      type: object
+      description: RFC 7807
+      properties:
+        type: {type: string}
+        title: {type: string}
+        status: {type: integer}
+        detail: {type: string}
+        instance: {type: string}
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              campo: {type: string}
+              mensagem: {type: string}
+  responses:
+    EntradaInvalida:
+      description: Parametro invalido, pacienteId ausente para MEDICO/ADMINISTRADOR, ou periodo invertido
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    NaoAutenticado:
+      description: Token ausente ou invalido
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    PerfilSemAcesso:
+      description: Perfil ATENDENTE nao consulta historico
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}
+    NaoEncontrado:
+      description: Paciente inexistente, nao atendido pelo medico, ou usuario sem paciente vinculado
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problema'}

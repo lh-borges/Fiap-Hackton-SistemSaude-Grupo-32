@@ -1,10 +1,12 @@
 package br.com.fiap.sus.consultas.application.usecase;
 
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import br.com.fiap.sus.consultas.application.event.ConsultaCanceladaEvent;
 import br.com.fiap.sus.cadastros.api.CadastroQuery;
 import br.com.fiap.sus.consultas.application.dto.CancelarConsultaDTO;
 import br.com.fiap.sus.consultas.application.dto.ConsultaOutput;
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +41,11 @@ class CancelarConsultaUseCaseTest {
     @Mock
     private UsuarioAutenticadoProvider usuarioAutenticadoProvider;
 
+    @Mock
+
+    private ApplicationEventPublisher eventPublisher;
+
+
     private CancelarConsultaUseCase useCase;
 
     private final UUID pacienteId = UUID.randomUUID();
@@ -46,7 +54,7 @@ class CancelarConsultaUseCaseTest {
 
     @BeforeEach
     void configurar() {
-        useCase = new CancelarConsultaUseCase(consultaRepository, cadastroQuery, usuarioAutenticadoProvider);
+        useCase = new CancelarConsultaUseCase(consultaRepository, cadastroQuery, usuarioAutenticadoProvider, eventPublisher);
     }
 
     private Consulta consultaAgendada() {
@@ -67,6 +75,7 @@ class CancelarConsultaUseCaseTest {
         ConsultaOutput resultado = useCase.executar(new CancelarConsultaDTO(consultaId, "Motivo"));
 
         assertThat(resultado.situacao()).isEqualTo(SituacaoConsulta.CANCELADA);
+        verify(eventPublisher).publishEvent(any(ConsultaCanceladaEvent.class));
     }
 
     @Test
