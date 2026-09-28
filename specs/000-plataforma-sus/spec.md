@@ -69,6 +69,7 @@ inexistente.
 | 7 | Receitas | Emissão, renovação e consulta de receita e seus itens | `007-receitas` |
 | 8 | Documentos | Atestado, laudo, relatório, encaminhamento, declaração | `008-documentos` |
 | 9 | Notificações | Aviso ao usuário sobre eventos do seu atendimento | `009-notificacoes` |
+| 10 | Histórico | Linha do tempo do paciente derivada dos registros (J-05, RF-11) | `010-historico` |
 
 ## 7. Jornadas principais
 

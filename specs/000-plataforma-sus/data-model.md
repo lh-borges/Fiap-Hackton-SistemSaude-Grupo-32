@@ -177,6 +177,14 @@ para idempotência do consumidor.
 
 ---
 
+## Módulo `historico` — sem tabela
+
+O histórico do paciente (`010-historico`) não tem migration nem entidade JPA: a linha do tempo
+é montada em tempo de leitura a partir das portas `api` de `consultas`, `exames`, `resultados`,
+`pareceres`, `receitas` e `documentos`, conforme a spec-mãe (seção 4: "tabela de histórico
+dedicada" está fora de escopo). A faixa `V0100..V0109` fica reservada caso um dia seja preciso
+materializar uma projeção.
+
 ## Infraestrutura — V0090..V0099
 
 ### `event_publication` — `V0091`
