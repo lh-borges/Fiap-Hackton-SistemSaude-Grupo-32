@@ -52,15 +52,27 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info,prometheus,metrics
   endpoint:
     health:
       show-details: never
-    prometheus:
-      enabled: true
+      probes:
+        enabled: true
+  # Exporta as metricas no formato Prometheus (/actuator/prometheus)
+  prometheus:
+    metrics:
+      export:
+        enabled: true
   metrics:
+    # Tag "application" usada pelos dashboards do Grafana (ex.: 4701, 11378, 19004)
     tags:
       application: ${spring.application.name}
+    distribution:
+      # Habilita histogramas/percentis de latencia HTTP (p95, p99) nos paineis
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
 
 springdoc:
   swagger-ui:

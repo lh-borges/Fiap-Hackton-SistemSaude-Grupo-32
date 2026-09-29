@@ -107,26 +107,43 @@ Arquivos envolvidos:
 3. Valide a API:
    - Health: http://localhost:8080/actuator/health
    - Métricas: http://localhost:8080/actuator/prometheus
+   - A página de métricas deve aparecer em texto, com linhas como
+     `jvm_memory_used_bytes` e `http_server_requests_seconds_count`.
 
 4. Valide o Prometheus:
    - Abra http://localhost:9090/targets
-   - O target `sus-api` deve aparecer como `UP`.
+   - O job `sus-api` deve aparecer como `UP`.
+   - O endpoint coletado deve ser `http://api:8080/actuator/prometheus`.
+   - Se aparecer `DOWN`, confira o [`prometheus.yml`](prometheus.yml): dentro do Docker,
+     use o nome do serviço (`api:8080`), não `localhost`.
 
 5. Valide o Grafana:
    - Abra http://localhost:3000
    - Login: `admin`
    - Senha: `admin`
-   - Acesse **Dashboards → SUS API Overview**.
+   - No primeiro acesso, o Grafana pode pedir a troca da senha.
+   - Acesse **Dashboards → SUS API Overview** para ver o dashboard provisionado pelo projeto.
 
 ### Como acessar o Prometheus
 
-1. Abra http://localhost:9090
-2. Vá em **Status → Targets**
-3. Confirme que o job **sus-api** aparece como **UP**
-4. Se quiser testar a coleta diretamente, abra:
-   - http://localhost:8080/actuator/prometheus
-5. Você deve ver métricas em texto do Spring Boot, como `http_server_requests_seconds_count`,
-   `jvm_memory_used_bytes` e outras métricas do Micrometer.
+1. Abra http://localhost:8080/actuator/prometheus no navegador.
+2. Confirme que a API expõe métricas em texto. Exemplos esperados:
+   - `jvm_memory_used_bytes`
+   - `http_server_requests_seconds_count`
+3. Abra http://localhost:9090/targets.
+4. Confirme que o job **sus-api** aparece como **UP**.
+5. Confirme que o endpoint mostrado é `http://api:8080/actuator/prometheus`.
+
+Se o target `sus-api` aparecer como `DOWN`, confira:
+
+- Se a API está rodando: http://localhost:8080/actuator/health
+- Se o [`prometheus.yml`](prometheus.yml) usa `api:8080`, que é o nome do serviço dentro
+  do Docker Compose.
+- Os logs:
+  ```bash
+  docker compose logs -f api
+  docker compose logs -f prometheus
+  ```
 
 ### Como acessar o Grafana
 
@@ -134,16 +151,58 @@ Arquivos envolvidos:
 2. Faça login com:
    - **Usuário:** `admin`
    - **Senha:** `admin`
-3. Vá em **Dashboards**
-4. Abra **SUS API Overview**
+3. Se o Grafana pedir, troque a senha no primeiro acesso.
+4. O projeto já provisiona um datasource e um dashboard inicial:
+   - **Dashboards → SUS API Overview**
 5. Para consultas manuais, vá em **Explore**, selecione **Prometheus** e teste:
    ```promql
    rate(http_server_requests_seconds_count{application="sus-plataforma"}[5m])
    ```
-6. Se o dashboard não aparecer automaticamente, reinicie o Grafana:
+6. Se o dashboard ou datasource não aparecer automaticamente, reinicie o Grafana:
    ```bash
    docker compose restart grafana
    ```
+
+### Como configurar o Prometheus no Grafana manualmente
+
+Use estes passos se o datasource não aparecer automaticamente ou se você quiser configurar
+um datasource novo:
+
+1. Abra http://localhost:3000.
+2. Faça login com `admin` / `admin` ou com a senha que você definiu no primeiro acesso.
+3. No menu lateral, acesse **Connections → Data sources**.
+4. Clique em **Add data source**.
+5. Escolha **Prometheus**.
+6. Em **Connection → Prometheus server URL**, informe:
+   ```text
+   http://prometheus:9090
+   ```
+   Esse é o nome do serviço do Prometheus dentro do `docker-compose.yml`. No Grafana em
+   container, use `prometheus:9090`, não `localhost:9090`.
+7. Role até o final e clique em **Save & test**.
+8. A mensagem esperada é **Successfully queried the Prometheus API**.
+
+### Como importar dashboards prontos no Grafana
+
+Além do dashboard inicial do projeto, você pode importar dashboards públicos:
+
+1. No Grafana, acesse **Dashboards → New → Import**.
+2. Em **Import via grafana.com**, informe um dos IDs:
+
+   | ID | Dashboard |
+   |---:|---|
+   | `19004` | Spring Boot 3 Statistics |
+   | `4701` | JVM (Micrometer): memória, threads, GC |
+
+3. Clique em **Load**.
+4. No campo **Prometheus**, selecione o datasource criado ou provisionado.
+5. Clique em **Import**.
+6. No topo do dashboard, se houver filtro, selecione `application = sus-plataforma`.
+7. Ajuste o período para **Last 15 minutes**.
+8. Gere tráfego na API para alimentar os painéis:
+   - Swagger: http://localhost:8080/swagger-ui.html
+   - Swagger alternativo: http://localhost:8080/swagger-ui/index.html
+   - Postman: rode algumas requisições da collection em [`postman/`](postman/).
 
 ### Verificação rápida de funcionamento
 

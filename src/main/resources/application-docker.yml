@@ -1,4 +1,6 @@
 spring:
+  flyway:
+    out-of-order: true
   jpa:
     show-sql: false
   kafka:
