@@ -374,6 +374,10 @@ Stack: Java 21 · Spring Boot 3.5 · Spring Security (JWT) · Spring Data JPA ·
 | [`src/main/resources/db/migration/`](src/main/resources/db/migration/) | Migrations Flyway, faixa numérica reservada por módulo |
 | [`postman/`](postman/) | Coleção e environment |
 | [`docs/fluxo-sdd.md`](docs/fluxo-sdd.md) | Como a equipe trabalha no dia a dia |
+| [`docs/C4-Nivel1-Contexto.pdf`](docs/C4-Nivel1-Contexto.pdf) | Diagrama C4 Nível 1 — Contexto do sistema |
+| [`docs/C4-Nivel2-Containers.pdf`](docs/C4-Nivel2-Containers.pdf) | Diagrama C4 Nível 2 — Contêineres (API, Postgres, Kafka, Observabilidade) |
+| [`docs/C4-Nivel3-Componentes.pdf`](docs/C4-Nivel3-Componentes.pdf) | Diagrama C4 Nível 3 — Módulos Spring Modulith e fluxo de eventos |
+| [`docs/C4-Nivel4-Codigo.pdf`](docs/C4-Nivel4-Codigo.pdf) | Diagrama C4 Nível 4 — Clean Architecture interna de um módulo |
 | [`CLAUDE.md`](CLAUDE.md) | Guia de contexto para quem (ou o que) chega agora |
 
 ## Desenvolvimento
