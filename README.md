@@ -10,6 +10,13 @@ notificações — com acesso controlado por perfil.
 médico. O resultado é persistido de forma independente do parecer, preservando autoria,
 histórico e rastreabilidade.
 
+## Vídeos
+
+| Vídeo | YouTube | Arquivo local |
+|---|---|---|
+| Pitch de apresentação | [youtube.com/watch?v=dUrBcF15nv8](https://www.youtube.com/watch?v=dUrBcF15nv8) | [`pitch_Hackaton.mp4`](pitch_Hackaton.mp4) |
+| Demonstração do MVP | [youtu.be/WIOXiWBTkg0](https://youtu.be/WIOXiWBTkg0) | [`23-46-03.mp4`](23-46-03.mp4) |
+
 ## Estado atual
 
 | Módulo | Feature | Status |
